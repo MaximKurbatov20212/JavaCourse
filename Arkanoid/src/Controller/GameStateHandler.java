@@ -117,7 +117,6 @@ public class GameStateHandler implements ActionListener {
         mainMenu.setCondition(MainMenu.IN_GAME);
         mainMenu.setVisible(false);
 
-        BlockManager.INSTANCE.setVisible();
         BlockManager.INSTANCE.fillField();
     }
 
@@ -139,6 +138,8 @@ public class GameStateHandler implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+//        field.makeMove();
+//        view.repaint();
         Viewer.INSTANCE.repaint();
         if(condition != IN_GAME) return;
         if(BlockManager.INSTANCE.isAllBlocksDied()) {

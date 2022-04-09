@@ -3,8 +3,10 @@ package Controller;
 import java.awt.event.*;
 
 public class GameController extends KeyAdapter {
-    public final static GameController INSTANCE = new GameController();
+    public static final GameController INSTANCE = new GameController();
     private final GameStateHandler gameHandler = GameStateHandler.INSTANCE;
+
+    private GameController() {}
 
     public void initGame() {
         gameHandler.initGame();

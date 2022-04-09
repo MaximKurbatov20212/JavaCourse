@@ -5,37 +5,43 @@ import java.awt.*;
 
 public class Platform extends JFrame  {
     public final static Platform INSTANCE = new Platform();
-    private final int OFFSET = 10; // Moved OFFSET pixels after pressed key
+    private static final int OFFSET = 10; // Moved OFFSET pixels after pressed key
 
-    private final int RIGHT_CODE = 39;
-    private final int LEFT_CODE = 37;
+    private static final int RIGHT_CODE = 39;
+    private static final int LEFT_CODE = 37;
 
-    private final int lenOfPlatform = 80;
-    private final int heightOfPlatform = 13;
+    private static final int LEN_OF_PLATFORM = 80;
+    private static final int HEIGHT_OF_PLATFORM = 13;
 
     private Image platformImage;
     private int positionX;
-    private int positionY;
+    private final int positionY;
 
     private int direction; // 37 - left, 39 right, 0 - stand
 
     private void loadImage() {
         ImageIcon iplatform = new ImageIcon("src/Pictures/platform.png");
-        platformImage = iplatform.getImage().getScaledInstance(lenOfPlatform, heightOfPlatform, Image.SCALE_DEFAULT);
+        platformImage = iplatform.getImage().getScaledInstance(LEN_OF_PLATFORM, HEIGHT_OF_PLATFORM, Image.SCALE_DEFAULT);
     }
 
+    // CR: create in GameField
     private Platform() {
         loadImage();
         positionX = GameField.INSTANCE.getWidth() / 2;
         positionY = GameField.INSTANCE.getHeight() - HEIGHT - 50;
     }
 
+//    CR:
+//    enum Direction {
+//        LEFT,
+//        RIGHT
+//    }
     public void move(int direction) {
-        if (direction == RIGHT_CODE && positionX + lenOfPlatform  < GameField.INSTANCE.getAreaWidth()) {
+        if (direction == RIGHT_CODE && positionX + LEN_OF_PLATFORM < GameField.INSTANCE.getAreaWidth()) {
             positionX += OFFSET;
         }
 
-        else if (direction == LEFT_CODE  && positionX > 10) {
+        else if (direction == LEFT_CODE  && positionX > GameField.INSTANCE.getWallWidth()) {
             positionX -= OFFSET;
         }
     }
@@ -57,7 +63,7 @@ public class Platform extends JFrame  {
     }
 
     public int getLen() {
-        return lenOfPlatform;
+        return LEN_OF_PLATFORM;
     }
 
     public void setPosition(int i) {

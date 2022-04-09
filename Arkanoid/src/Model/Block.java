@@ -9,26 +9,15 @@ import java.awt.*;
 public class Block extends JFrame {
     public static final int HEIGHT = 20;
     public static final int WIDTH = 80;
-    private int positionX;
-    private int positionY;
-    private boolean isLife;
+    private final int positionX;
+    private final int positionY;
     private Image blockImage;
 
-    private Color color;
     private int numberOfLives;
 
-    public void setPositionX(int positionX) {
-        this.positionX = positionX;
-    }
-
-    public void setPositionY(int positionY) {
-        this.positionY = positionY;
-    }
-
-    public Block(int X, int Y) {
-        positionX = X;
-        positionY = Y;
-        isLife = true;
+    public Block(int x, int y) {
+        positionX = x;
+        positionY = y;
 
         switch((int)(Math.random() * 3)) {
             case 0: {
@@ -48,10 +37,6 @@ public class Block extends JFrame {
         }
     }
 
-    public void setLife(boolean a) {
-        isLife = a;
-    }
-
     public int getPositionX() {
         return positionX;
     }
@@ -62,10 +47,6 @@ public class Block extends JFrame {
 
     public boolean isLife() {
         return numberOfLives > 0;
-    }
-
-    public Color getColor() {
-        return color;
     }
 
     public void decreaseLives() {

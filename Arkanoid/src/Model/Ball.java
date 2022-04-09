@@ -8,18 +8,15 @@ public class Ball extends JFrame {
     public final static Ball INSTANCE = new Ball();
     private Image ballImage;
     private final int radius = 10;
-    private int positionX;
-    private int positionY;
+    private int positionX = 200;
+    private int positionY = 450;
 
     public static final int EPS = 5;
 
-    private directingVector dVector;
+    private final DirectingVector dVector = new DirectingVector();
 
     private Ball() {
         loadImage();
-        dVector = new directingVector();
-        positionX = 200;
-        positionY = 450;
     }
 
     public double getDirectingVectorCordY() {
@@ -40,23 +37,22 @@ public class Ball extends JFrame {
     }
 
 
-    private class directingVector {
-        public double x, y;
-        public directingVector() {
-            x = 0.0f;
-            y = 1.0f;
-        }
+    private static class DirectingVector {
+        private double x;
+        private double y = 1.0f;
 
-        public void norm() {
+        private void norm() {
             x = x / Math.sqrt(x*x + y*y);
             y = y / Math.sqrt(x*x + y*y);
         }
     }
 
+    // CR: move
     private void loadImage() {
         ImageIcon iBall = new ImageIcon("src/Pictures/ball.png");
         ballImage = iBall.getImage().getScaledInstance(20,20,  Image.SCALE_DEFAULT);
     }
+
     public void setPosition(int x, int y) {
         this.positionX = x;
         this.positionY = y;
@@ -79,7 +75,7 @@ public class Ball extends JFrame {
     }
 
     private boolean hitRightWall() {
-        return positionX + 20 >= GameField.INSTANCE.getAreaWidth();
+        return positionX + (2 * radius) >= GameField.INSTANCE.getAreaWidth();
     }
 
     private int getBallCenterX() {
@@ -87,7 +83,7 @@ public class Ball extends JFrame {
     }
 
     private boolean hitFloor() {
-        if(positionY + 10 > GameField.INSTANCE.getHeight()) {
+        if(positionY + GameField.INSTANCE.getWallWidth() > GameField.INSTANCE.getHeight()) {
             System.out.println("HIT Floor");
             return true;
         }
@@ -133,7 +129,8 @@ public class Ball extends JFrame {
             double halfWidth = (double)platform.getLen() / 2;
             double x = halfWidth - (getBallCenterX() - platform.getPositionX());
             double y = Math.sqrt(Math.abs(halfWidth * halfWidth - x * x));
-            setDirectingVector(x, y);
+            dVector.x = x;
+            dVector.y = y;
         }
     }
 }

@@ -24,12 +24,6 @@ public class BlockManager {
         return numberLiveBlocks == 0;
     }
 
-    public void setVisible() {
-        for(int i = 0 ; i < COUNT; i++) {
-            blocks[i].setLife(true);
-        }
-    }
-
     public Block getBlock(int i) {
         if(i > COUNT) {
             throw new AssertionError("No such block");

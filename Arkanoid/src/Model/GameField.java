@@ -5,9 +5,10 @@ import java.awt.*;
 
 public class GameField extends JPanel {
     public final static GameField INSTANCE = new GameField();
-    private final int WIDTH = 700;
-    private final int HEIGHT = 550;
-    private final int BALL_AREA_WIDTH = 490;
+    private static final int WALL_WIDTH = 10;
+    private static final int WIDTH = 700;
+    private static final int HEIGHT = 550;
+    private static final int BALL_AREA_WIDTH = 490;
 
     private Integer score = 0;
     private Image backGroundImage;
@@ -80,5 +81,9 @@ public class GameField extends JPanel {
 
     public void setScore(int i) {
         score = i;
+    }
+
+    public int getWallWidth() {
+        return WALL_WIDTH;
     }
 }
