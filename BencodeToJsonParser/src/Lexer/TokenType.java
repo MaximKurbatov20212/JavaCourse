@@ -2,7 +2,7 @@ package Lexer;
 
 public enum TokenType {
     NUM,
-    ARR,
+    STR,
     START_LIST,
     END_LIST,
     START_DICT,

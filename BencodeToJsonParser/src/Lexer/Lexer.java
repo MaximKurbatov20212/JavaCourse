@@ -37,7 +37,7 @@ public class Lexer {
         int len = getLen(line);
         String res = line.substring(curPos, curPos + len);
         curPos = curPos + len;
-        return new Token(TokenType.ARR, res, curNesting);
+        return new Token(TokenType.STR, res, curNesting);
     }
 
     private void scan(String line) {

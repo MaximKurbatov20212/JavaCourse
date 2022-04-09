@@ -1,3 +1,3 @@
 package Parser;
 
-public class PairNotFoundException extends RuntimeException{}
+public class PairNotFoundException extends RuntimeException {}

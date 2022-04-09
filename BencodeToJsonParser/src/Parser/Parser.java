@@ -1,6 +1,8 @@
 package Parser;
 
 import Lexer.Token;
+
+import java.util.ArrayList;
 import java.util.List;
 import static Lexer.TokenType.*;
 
@@ -23,7 +25,7 @@ public class Parser {
     private Expr parseExpr() {
         Token token = tokens.get(curPos);
         switch (token.type()) {
-            case ARR, NUM -> {
+            case STR, NUM -> {
                 return parsePrimary();
             }
 
@@ -46,7 +48,8 @@ public class Parser {
 
     private Expr parseDict() {
         curPos++;
-        BDict bDict = new BDict();
+        Parser.Expr.BDict bDict = new Parser.Expr.BDict();
+        // CR: until d....e
         while (true) {
             Expr expr = parsePair();
             if(expr == null) return bDict;
@@ -56,7 +59,8 @@ public class Parser {
 
     private Expr parseList() {
         curPos++;
-        BList bList = new BList();
+        Parser.Expr.BList bList = new Parser.Expr.BList();
+        // CR: until l....e
         while (true) {
             Token token = tokens.get(curPos);
             switch (token.type()) {
@@ -73,25 +77,26 @@ public class Parser {
     }
 
     private Expr parsePair() throws PairNotFoundException {
-        Array left = parseArray();
+        Parser.Expr.BString left = parseString();
+        // CR: parse any expr
         Expr right = parsePrimary();
         if(left == null || right == null) return null;
-        return new Pair(left, right);
+        return new Expr.BEntry(left, right);
     }
 
-    private Array parseArray() {
+    private Parser.Expr.BString parseString() {
         Token token = tokens.get(curPos++);
         if(token.type() == EOF) return null;
-        if(token.type() != ARR) throw new RuntimeException();
-        return new Array(token.value());
+        if(token.type() != STR) throw new RuntimeException();
+        return new Parser.Expr.BString(token.value());
     }
 
     private Expr parsePrimary() {
         Token token = tokens.get(curPos++);
         if(token.type() == EOF) return null;
-        if(token.type() == ARR) {
-            return new Array(token.value());
+        if(token.type() == STR) {
+            return new Parser.Expr.BString(token.value());
         }
-        return new Number(Integer.parseInt(token.value()));
+        return new Parser.Expr.BNumber(Integer.parseInt(token.value()));
     }
 }

@@ -1,6 +1,7 @@
 package Parser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 //  ParseToken:
 //
@@ -15,42 +16,36 @@ import java.util.ArrayList;
 //  ParseNumber -> can do it
 //
 
-abstract class Expr {}
+sealed interface Expr {
+    record BString(String value) implements Expr {}
 
-class Array extends Expr {
-    private String value;
-    Array(String value) {
-        this.value = value;
+    record BNumber(int value) implements Expr {}
+
+    record BEntry(BString left, Expr right) implements Expr {}
+
+    record BList(List<Expr> list) implements Expr {
+        void add(Expr expr) {
+            list.add(expr);
+        }
+    }
+
+    record BDict(List<BEntry> list) implements Expr {
+        void add(BEntry pair) {
+            list.add(pair);
+        }
     }
 }
 
-class Number extends Expr {
-    private int value;
-    Number(int value) {
-        this.value = value;
-    }
-}
-
-class Pair extends Expr {
-    private Array left;
-    private Expr right;
-    Pair(Array left, Expr right) {
-        this.left = left;
-        this.right = right;
-    }
-}
-
-class BList extends Expr {
-    private ArrayList<Expr> list = new ArrayList<Expr>();
-    void add(Expr expr) {
-        list.add(expr);
-    }
-}
-
-class BDict extends Expr {
-    private ArrayList<Expr> list = new ArrayList<Expr>();
-
-    void add(Expr pair) {
-        list.add(pair);
-    }
-}
+//class Parser {
+//    List<Token> tokens;
+//    int pos;
+//
+//    Expr parseList() {
+//        consume(L);
+//        List<Parser.Expr.BEntry> entries = new ArrayList<>();
+//        while (isEndToken()) {
+//            entries.add(parseEntry());
+//        }
+//        return new Expr.BDict(entries);
+//    }
+//}
