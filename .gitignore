@@ -1,0 +1,7 @@
+*.class
+*.iml
+Arkanoid/out/*
+Arkanoid/.*.sh*
+Arkanoid/*.idea
+BencodeToJsonParser/.idea
+

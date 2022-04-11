@@ -1,2 +1,5 @@
-package Parser;public class JsonPrinter {
+package Parser;
+
+public class JsonPrinter {
+
 }

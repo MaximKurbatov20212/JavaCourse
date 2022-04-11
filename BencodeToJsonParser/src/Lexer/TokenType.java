@@ -4,9 +4,8 @@ public enum TokenType {
     NUM,
     STR,
     START_LIST,
-    END_LIST,
     START_DICT,
-    END_DICT,
+    END_BRACKET,
     EOL,
     EOF
 }

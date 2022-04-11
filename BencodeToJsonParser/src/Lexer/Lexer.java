@@ -3,17 +3,16 @@ package Lexer;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import Reporter.ErrorReporter;
 
 public class Lexer {
-    private final BufferedReader br;
     private final List<Token> tokens = new ArrayList<>();
-    private int curPos = 0;
-    private int curNesting = 0;
-    private Stack<Token> stack = new Stack<Token>();
+    private int curPos;
+
+    private final BufferedReader br;
     private final ErrorReporter errorReporter = new ErrorReporter();
+
 
     public Lexer(BufferedReader br) {
         this.br = br;
@@ -24,11 +23,7 @@ public class Lexer {
         while ((line = br.readLine()) != null) {
             scan(line);
         }
-        tokens.add(new Token(TokenType.EOF, "", curNesting));
-
-        if (!stack.empty()) {
-            System.out.println("Incorrect format");
-        }
+        tokens.add(new Token(TokenType.EOF, ""));
         System.out.println(tokens);
         return tokens;
     }
@@ -37,69 +32,49 @@ public class Lexer {
         int len = getLen(line);
         String res = line.substring(curPos, curPos + len);
         curPos = curPos + len;
-        return new Token(TokenType.STR, res, curNesting);
+        return new Token(TokenType.STR, res);
     }
 
     private void scan(String line) {
         while (curPos < line.length()) {
             char c = line.charAt(curPos);
+
             // array
             if (isDigit(c)) {
                 tokens.add(getArray(line));
                 continue;
             }
             switch (c) {
-                case ' ' -> {
-                    curPos++;
-                }
+                case ' ' -> curPos++;
 
-                case 'd' -> {
-                    tokens.add(new Token(TokenType.START_DICT, "{", curNesting));
-                    stack.push(new Token(TokenType.START_DICT, "{", curNesting));
-                    curPos++;
-                    curNesting++;
-                }
-
-                // number
-                case 'i' -> {
-                    curPos++;
-                    tokens.add(getNumber(line));
-                }
+                case 'd' -> addToken(new Token(TokenType.START_DICT, "["));
 
                 // list
-                case 'l' -> {
-                    tokens.add(new Token(TokenType.START_LIST, "[", curNesting));
-                    stack.push(new Token(TokenType.START_LIST, "[", curNesting));
-                    curPos++;
-                    curNesting++;
-                }
+                case 'l' -> addToken(new Token(TokenType.START_LIST, "["));
+
+                // number
+                case 'i' -> addToken(getNumber(line));
 
                 // dictionary/list
-                case 'e' -> {
-                    if (stack.empty()) {
-                        errorReporter.report("Incorrect Token END_LIST or END_DICT");
-                        return;
-                    }
-                    curNesting--;
-                    if (stack.pop().type() == TokenType.START_LIST) {
-                        tokens.add(new Token(TokenType.END_LIST, "]", curNesting));
-                    } else {
-                        tokens.add(new Token(TokenType.END_DICT, "}", curNesting));
-                    }
-                    curPos++;
-                }
+                case 'e' -> addToken(new Token(TokenType.END_BRACKET, ""));
 
                 default -> {
-                    System.out.println("Unknown char" + c);
+                    errorReporter.report("Unknown char" + c);
                     curPos++;
                 }
             }
         }
-        tokens.add(new Token(TokenType.EOL, "", curNesting));
+        tokens.add(new Token(TokenType.EOL, ""));
+    }
+
+    private void addToken(Token token) {
+        tokens.add(token);
+        curPos++;
     }
 
 
     private int getLen(String line) {
+        int i = Integer.parseInt(line);
         int len = 0;
         char c = line.charAt(curPos);
         while (c != ':') {
@@ -123,7 +98,7 @@ public class Lexer {
             }
             curPos++;
         }
-        return new Token(TokenType.NUM, line.substring(start, curPos++), curNesting); // curPos++ skip 'e'
+        return new Token(TokenType.NUM, line.substring(start, curPos++)); // curPos++ skip 'e'
     }
 
     private static boolean isDigit(char c) {
