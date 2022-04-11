@@ -1,3 +1,5 @@
+package main;
+
 import Controller.GameController;
 
 public class Main {
@@ -6,3 +8,4 @@ public class Main {
         controller.initGame();
     }
 }
+

@@ -49,7 +49,7 @@ public class Ball extends JFrame {
 
     // CR: move
     private void loadImage() {
-        ImageIcon iBall = new ImageIcon("src/Pictures/ball.png");
+        ImageIcon iBall = new ImageIcon("src/main/java/Pictures/ball.png");
         ballImage = iBall.getImage().getScaledInstance(20,20,  Image.SCALE_DEFAULT);
     }
 

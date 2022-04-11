@@ -32,7 +32,7 @@ public class MainMenu {
 
     public MainMenu() throws IOException {
         loadImage();
-        FileReader file = new FileReader("src/Pictures/HighScores.txt");
+        FileReader file = new FileReader("src/main/java/Pictures/HighScores.txt");
         BufferedReader bf = new BufferedReader(file);
         while(true) {
             String a = bf.readLine();
@@ -51,9 +51,9 @@ public class MainMenu {
     }
 
     private void loadImage() {
-        ImageIcon iMainMenu = new ImageIcon("src/Pictures/Main1.jpg");
+        ImageIcon iMainMenu = new ImageIcon("src/main/java/Pictures/Main1.jpg");
         mainMenuImage = iMainMenu.getImage();
-        ImageIcon iAboutMenu = new ImageIcon("src/Pictures/About.jpg");
+        ImageIcon iAboutMenu = new ImageIcon("src/main/java/Pictures/About.jpg");
         aboutMenuImage = iAboutMenu.getImage();
     }
 
@@ -119,7 +119,7 @@ public class MainMenu {
         public static final int EXIT = 3;
 
         Cursor() {
-            ImageIcon iCursor = new ImageIcon("src/Pictures/cursor.jpg");
+            ImageIcon iCursor = new ImageIcon("src/main/java/Pictures/cursor.jpg");
             cursorImage = iCursor.getImage();
         }
 

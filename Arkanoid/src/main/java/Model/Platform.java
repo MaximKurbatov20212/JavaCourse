@@ -20,7 +20,7 @@ public class Platform extends JFrame  {
     private int direction; // 37 - left, 39 right, 0 - stand
 
     private void loadImage() {
-        ImageIcon iplatform = new ImageIcon("src/Pictures/platform.png");
+        ImageIcon iplatform = new ImageIcon("src/main/java/Pictures/platform.png");
         platformImage = iplatform.getImage().getScaledInstance(LEN_OF_PLATFORM, HEIGHT_OF_PLATFORM, Image.SCALE_DEFAULT);
     }
 

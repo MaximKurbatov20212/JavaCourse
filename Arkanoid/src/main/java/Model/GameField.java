@@ -51,11 +51,11 @@ public class GameField extends JPanel {
     }
 
     private void loadImage() {
-        ImageIcon backGround = new ImageIcon("src/Pictures/Field.jpg");
+        ImageIcon backGround = new ImageIcon("src/main/java/Pictures/Field.jpg");
         backGroundImage = backGround.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_DEFAULT);
-        ImageIcon iWin = new ImageIcon("src/Pictures/win.png");
+        ImageIcon iWin = new ImageIcon("src/main/java/Pictures/win.png");
         winImage = iWin.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_DEFAULT);
-        ImageIcon iLose = new ImageIcon("src/Pictures/lose.png");
+        ImageIcon iLose = new ImageIcon("src/main/java/Pictures/lose.png");
         loseImage = iLose.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_DEFAULT);
     }
 

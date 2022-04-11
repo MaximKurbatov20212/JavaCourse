@@ -21,17 +21,17 @@ public class Block extends JFrame {
 
         switch((int)(Math.random() * 3)) {
             case 0: {
-                blockImage = new ImageIcon("src/Pictures/blueBlock.jpg").getImage();
+                blockImage = new ImageIcon("src/main/java/Pictures/blueBlock.jpg").getImage();
                 numberOfLives = 3;
                 break;
             }
             case 1: {
-                blockImage = new ImageIcon("src/Pictures/greenBlock.jpg").getImage();
+                blockImage = new ImageIcon("src/main/java/Pictures/greenBlock.jpg").getImage();
                 numberOfLives = 2;
                 break;
             }
             case 2: {
-                blockImage = new ImageIcon("src/Pictures/redBlock.jpg").getImage();
+                blockImage = new ImageIcon("src/main/java/Pictures/redBlock.jpg").getImage();
                 numberOfLives = 1;
             }
         }
