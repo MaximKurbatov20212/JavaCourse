@@ -1,6 +1,7 @@
 package Lexer;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,13 @@ public class Lexer {
             scan(line);
         }
         tokens.add(new Token(TokenType.EOF, ""));
-        System.out.println(tokens);
+        System.err.println(tokens);
         return tokens;
+    }
+
+    public static List<Token> scan(BufferedReader br) throws IOException {
+        Lexer lexer = new Lexer(br);
+        return lexer.getTokens();
     }
 
     private Token getArray(String line) {
@@ -47,7 +53,7 @@ public class Lexer {
             switch (c) {
                 case ' ' -> curPos++;
 
-                case 'd' -> addToken(new Token(TokenType.START_DICT, "["));
+                case 'd' -> addToken(new Token(TokenType.START_DICT, "{"));
 
                 // list
                 case 'l' -> addToken(new Token(TokenType.START_LIST, "["));
@@ -64,7 +70,8 @@ public class Lexer {
                 }
             }
         }
-        tokens.add(new Token(TokenType.EOL, ""));
+//        tokens.add(new Token(TokenType.EOL, ""));
+        curPos = 0;
     }
 
     private void addToken(Token token) {
@@ -72,26 +79,21 @@ public class Lexer {
         curPos++;
     }
 
-
     private int getLen(String line) {
-        int i = Integer.parseInt(line);
-        int len = 0;
-        char c = line.charAt(curPos);
-        while (c != ':') {
+        char c;
+        int start = curPos;
+        while((c = line.charAt(curPos)) != ':') {
             if (!isDigit(c)) {
                 throw new RuntimeException();
             }
-            len = len * 10 + (c - '0');
             curPos++;
-            c = line.charAt(curPos);
         }
-        curPos++;
-        return len;
+        return Integer.parseInt(line.substring(start, curPos++));
     }
 
     private Token getNumber(String line) {
         char c;
-        int start = curPos;
+        int start = ++curPos;
         while ((c = line.charAt(curPos)) != 'e') {
             if (!isDigit(c)) {
                 throw new RuntimeException();
