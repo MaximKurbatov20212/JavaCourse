@@ -1,5 +1,7 @@
 package Controller;
 
+import View.Viewer;
+
 import java.awt.event.*;
 
 public class GameController extends KeyAdapter {
@@ -9,7 +11,7 @@ public class GameController extends KeyAdapter {
     private GameController() {}
 
     public void initGame() {
-        gameHandler.initGame();
+        gameHandler.registr();
     }
 
     @Override

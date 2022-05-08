@@ -3,9 +3,6 @@ package Model;
 import javax.swing.*;
 import java.awt.*;
 
-// Red - 3 lives
-// Green - 2 lives
-// Blue - 1 live
 public class Block extends JFrame {
     public static final int HEIGHT = 20;
     public static final int WIDTH = 80;
@@ -19,18 +16,16 @@ public class Block extends JFrame {
         positionX = x;
         positionY = y;
 
-        switch((int)(Math.random() * 3)) {
-            case 0: {
+        switch ((int) (Math.random() * 3)) {
+            case 0 -> {
                 blockImage = new ImageIcon("src/main/java/Pictures/blueBlock.jpg").getImage();
                 numberOfLives = 3;
-                break;
             }
-            case 1: {
+            case 1 -> {
                 blockImage = new ImageIcon("src/main/java/Pictures/greenBlock.jpg").getImage();
                 numberOfLives = 2;
-                break;
             }
-            case 2: {
+            case 2 -> {
                 blockImage = new ImageIcon("src/main/java/Pictures/redBlock.jpg").getImage();
                 numberOfLives = 1;
             }

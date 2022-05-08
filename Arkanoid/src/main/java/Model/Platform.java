@@ -10,8 +10,8 @@ public class Platform extends JFrame  {
     private static final int RIGHT_CODE = 39;
     private static final int LEFT_CODE = 37;
 
-    private static final int LEN_OF_PLATFORM = 80;
-    private static final int HEIGHT_OF_PLATFORM = 13;
+    public static final int LEN_OF_PLATFORM = 80;
+    public static final int HEIGHT_OF_PLATFORM = 13;
 
     private Image platformImage;
     private int positionX;
@@ -27,8 +27,8 @@ public class Platform extends JFrame  {
     // CR: create in GameField
     private Platform() {
         loadImage();
-        positionX = GameField.INSTANCE.getWidth() / 2;
-        positionY = GameField.INSTANCE.getHeight() - HEIGHT - 50;
+        positionX = BackField.INSTANCE.getWidth() / 2;
+        positionY = BackField.INSTANCE.getHeight() - HEIGHT - 50;
     }
 
 //    CR:
@@ -37,11 +37,11 @@ public class Platform extends JFrame  {
 //        RIGHT
 //    }
     public void move(int direction) {
-        if (direction == RIGHT_CODE && positionX + LEN_OF_PLATFORM < GameField.INSTANCE.getAreaWidth()) {
+        if (direction == RIGHT_CODE && positionX + LEN_OF_PLATFORM < BackField.INSTANCE.getAreaWidth()) {
             positionX += OFFSET;
         }
 
-        else if (direction == LEFT_CODE  && positionX > GameField.INSTANCE.getWallWidth()) {
+        else if (direction == LEFT_CODE  && positionX > BackField.INSTANCE.getWallWidth()) {
             positionX -= OFFSET;
         }
     }

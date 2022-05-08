@@ -1,69 +1,87 @@
 package Model;
 
-import javax.swing.*;
-import java.awt.*;
+import Controller.GameStateHandler;
 
-public class GameField extends JPanel {
-    public final static GameField INSTANCE = new GameField();
-    private static final int WALL_WIDTH = 10;
-    private static final int WIDTH = 700;
-    private static final int HEIGHT = 550;
-    private static final int BALL_AREA_WIDTH = 490;
+import java.util.Arrays;
 
-    private Integer score = 0;
-    private Image backGroundImage;
-    private Image winImage;
-    private Image loseImage;
+public class GameField {
+    public static final GameField INSTANCE = new GameField();
+    private final Ball ball = Ball.INSTANCE;
+    private final Platform platform = Platform.INSTANCE;
+    private final BlockManager blockManager = BlockManager.INSTANCE;
+    private Winner winner = Winner.NOBODY;
 
-    private boolean isWinVisible = false;
-    private boolean isLoseVisible = false;
+    private static final int WIDTH = 490;
+    public static final int HEIGHT = 550;
+    int liveBlocks = N_BLOCKS;
 
-    public Image getWinImage() {
-        return winImage;
+    public boolean PlayerWin() {
+        return winner == Winner.PLAYER;
     }
 
-    public Image getLoseImage() {
-        return loseImage;
+    public boolean ComputerWin() {
+        return winner == Winner.COMPUTER;
     }
 
-    public void setWinVisible(boolean winVisible) {
-        isWinVisible = winVisible;
+    public void setWinner(Winner winner) {
+        this.winner = winner;
     }
 
-    public void setLoseVisible(boolean loseVisible) {
-        isLoseVisible = loseVisible;
+    public enum Winner {
+        PLAYER,
+        COMPUTER,
+        NOBODY
     }
 
-    public boolean getWinVisible() {
-        return isWinVisible;
+    private static final int N_BLOCKS = 25;
+
+    record Position(double x, double y) {}
+
+    public void makeMove() {
+        if (winner != Winner.NOBODY) return;
+
+        Position position = ball.move();
+        Block hit = getHittedBlock(position);
+        if (hit != null) {
+            hit.decreaseLives();
+            if (liveBlocks == 0) {
+                winner = Winner.PLAYER;
+                return;
+            }
+            ball.reflect(hit);
+            return;
+        }
+        if (wallCollision(position)) {
+            ball.reflect();
+            return;
+        }
+        if (platformCollision(position)) {
+            ball.platformReflect();
+            return;
+        }
+        if (outOfBounds(position)) {
+            winner = Winner.COMPUTER;
+            GameStateHandler.INSTANCE.condition = GameStateHandler.STOP_THE_WORLD;
+        }
     }
 
-    public boolean getLoseVisible() {
-        return isLoseVisible;
+    public Winner getWinner() {
+        return winner;
     }
 
-    private GameField() {
-        loadImage();
+    private boolean outOfBounds(Position position) {
+        return position.y > HEIGHT;
     }
 
-    public void increaseScore(int i) {
-        score += i;
+    private boolean platformCollision(Position position) {
+        return Platform.INSTANCE.getPositionY() - position.y < 2 * ball.getRadius() + 5 &&
+                Platform.INSTANCE.getPositionY() - position.y >= 2 * ball.getRadius() - 5 &&
+
+                position.x + 2 * ball.getRadius() >= Platform.INSTANCE.getPositionX() &&
+                position.x <= Platform.INSTANCE.getPositionX() + Platform.INSTANCE.getLen();
     }
 
-    private void loadImage() {
-        ImageIcon backGround = new ImageIcon("src/main/java/Pictures/Field.jpg");
-        backGroundImage = backGround.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_DEFAULT);
-        ImageIcon iWin = new ImageIcon("src/main/java/Pictures/win.png");
-        winImage = iWin.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_DEFAULT);
-        ImageIcon iLose = new ImageIcon("src/main/java/Pictures/lose.png");
-        loseImage = iLose.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_DEFAULT);
-    }
-
-    public Image getImage() {
-        return backGroundImage;
-    }
-
-    public int getWidth() {
+    public int getAreaWidth() {
         return WIDTH;
     }
 
@@ -71,19 +89,68 @@ public class GameField extends JPanel {
         return HEIGHT;
     }
 
-    public int getAreaWidth() {
-        return BALL_AREA_WIDTH;
+    private boolean wallCollision(Position position) {
+        return position.x < 10
+        || position.x + (2 * ball.getRadius()) >= BackField.INSTANCE.getAreaWidth()
+        || position.y < 10;
     }
 
-    public Integer getScore() {
-        return score;
+
+    private Block getHittedBlock(Position position) {
+        return Arrays.stream(blockManager.getBlocks())
+                .filter(block -> wasHit(block, position))
+                .findFirst()
+                .orElse(null);
     }
 
-    public void setScore(int i) {
-        score = i;
+    private boolean wasHit(Block block, Position position) {
+        return ballHitsBlockBelow(position, block) || ballHitsBlockAbove(position, block) || ballHitsBlockRight(position, block) || ballHitsBlockLeft(position, block);
     }
 
-    public int getWallWidth() {
-        return WALL_WIDTH;
+
+    boolean ballHitsBlockAbove(Position position, Block block) {
+        if(     block.getPositionX() < position.x + Block.HEIGHT &&
+                block.getPositionX() + Block.WIDTH > position.x &&
+                block.getPositionY() - Ball.EPS < position.y + 2 * ball.getRadius() &&
+                block.getPositionY() + Ball.EPS > position.y + 2 * ball.getRadius()) {
+            ball.setPosition(position.x, position.y - 3);
+            return true;
+        }
+        return false;
+    }
+
+    boolean ballHitsBlockBelow(Position position, Block block) {
+        if(block.getPositionX() < position.x + block.getHeight() &&
+                block.getPositionX() + Block.WIDTH > position.x &&
+                block.getPositionY() + Block.HEIGHT - Ball.EPS < position.y &&
+                block.getPositionY() + Block.HEIGHT + Ball.EPS >= position.y) {
+            ball.setPosition(position.x, position.y + 3);
+            return true;
+        }
+        return false;
+    }
+
+    boolean ballHitsBlockLeft(Position position, Block block) {
+        if(     block.getPositionX() + Ball.EPS > position.x + ball.getRadius() &&
+                block.getPositionX() <= position.x + ball.getRadius() &&
+                block.getPositionY() < position.y + ball.getRadius() &&
+                block.getPositionY() + Block.HEIGHT > position.y) {
+
+            ball.setPosition(position.x - 3, position.y);
+            return true;
+        }
+        return false;
+    }
+
+    boolean ballHitsBlockRight(Position position, Block block) {
+        if(     block.getPositionX() + Block.WIDTH - Ball.EPS < position.x &&
+                block.getPositionX() + Block.WIDTH  >= position.x &&
+                block.getPositionY() < position.y + ball.getRadius() &&
+                block.getPositionY() + Block.HEIGHT > position.y) {
+
+            ball.setPosition(position.x + 3, position.y);
+            return true;
+        }
+        return false;
     }
 }
