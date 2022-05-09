@@ -1,7 +1,5 @@
 package Controller;
 
-import View.Viewer;
-
 import java.awt.event.*;
 
 public class GameController extends KeyAdapter {

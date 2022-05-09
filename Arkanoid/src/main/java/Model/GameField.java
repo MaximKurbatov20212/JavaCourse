@@ -13,7 +13,12 @@ public class GameField {
 
     private static final int WIDTH = 490;
     public static final int HEIGHT = 550;
-    int liveBlocks = N_BLOCKS;
+
+    public enum Winner {
+        PLAYER,
+        COMPUTER,
+        NOBODY
+    }
 
     public boolean PlayerWin() {
         return winner == Winner.PLAYER;
@@ -27,14 +32,6 @@ public class GameField {
         this.winner = winner;
     }
 
-    public enum Winner {
-        PLAYER,
-        COMPUTER,
-        NOBODY
-    }
-
-    private static final int N_BLOCKS = 25;
-
     record Position(double x, double y) {}
 
     public void makeMove() {
@@ -42,10 +39,12 @@ public class GameField {
 
         Position position = ball.move();
         Block hit = getHittedBlock(position);
+
         if (hit != null) {
             hit.decreaseLives();
-            if (liveBlocks == 0) {
+            if (blockManager.isAllBlocksDied()) {
                 winner = Winner.PLAYER;
+                GameStateHandler.INSTANCE.condition = GameStateHandler.STOP_THE_WORLD;
                 return;
             }
             ball.reflect(hit);
@@ -63,10 +62,6 @@ public class GameField {
             winner = Winner.COMPUTER;
             GameStateHandler.INSTANCE.condition = GameStateHandler.STOP_THE_WORLD;
         }
-    }
-
-    public Winner getWinner() {
-        return winner;
     }
 
     private boolean outOfBounds(Position position) {
@@ -98,7 +93,7 @@ public class GameField {
 
     private Block getHittedBlock(Position position) {
         return Arrays.stream(blockManager.getBlocks())
-                .filter(block -> wasHit(block, position))
+                .filter(block -> block.isLife() && wasHit(block, position))
                 .findFirst()
                 .orElse(null);
     }

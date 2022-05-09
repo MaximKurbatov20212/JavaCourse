@@ -19,7 +19,6 @@ public class Registrator {
 
     JTextField smallField;
     boolean wasRegistrate = false;
-    JPanel contents = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
     private static String name;
 
@@ -29,15 +28,10 @@ public class Registrator {
 
     public Registrator() throws IOException {
         smallField = new JTextField(10);
-
         smallField.setFont(new Font("Arial", Font.BOLD, 72));
         smallField.setBackground(Color.black);
         smallField.setForeground(Color.red);
-
-        contents.setLocation(1000, 100);
-        contents.add(smallField);
-        Viewer.INSTANCE.add(contents);
-
+        Viewer.INSTANCE.add(smallField);
         loadScoresTable();
     }
 
@@ -46,17 +40,18 @@ public class Registrator {
 
         smallField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                smallField.setBounds(0,0,100,100);
+
                 if (!wasRegistrate) {
                     name = smallField.getText();
                     if(!isFree(name)) return;
 
-                    Viewer.INSTANCE.remove(contents);
+                    Viewer.INSTANCE.remove(smallField);
                     GameStateHandler.INSTANCE.initGame();
                 }
             }
         });
 
-        contents.add(smallField);
         Viewer.INSTANCE.setVisible(true);
     }
 
@@ -85,7 +80,7 @@ public class Registrator {
             file.close();
         }
         catch (IOException e) {
-            throw new RuntimeException("...");
+            throw new RuntimeException("Pls, don't delete HighScores.txt");
         }
     }
 }

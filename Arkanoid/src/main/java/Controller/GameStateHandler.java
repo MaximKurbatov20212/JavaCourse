@@ -31,6 +31,8 @@ public class GameStateHandler implements ActionListener {
     private final int ESC = 27;
     private final int EXIT = 4;
 
+    public static final double delay = 15;
+
     public int condition;
     private Timer timer;
 
@@ -96,7 +98,7 @@ public class GameStateHandler implements ActionListener {
     }
 
     public void initGame() {
-        timer = new Timer(30, this);
+        timer = new Timer((int) delay, this);
         timer.start();
         Viewer.INSTANCE.addKeyListener(GameController.INSTANCE);
         condition = IN_MAIN_MENU;

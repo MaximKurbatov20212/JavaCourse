@@ -1,5 +1,7 @@
 package Model;
 
+import static Controller.GameStateHandler.delay;
+
 public class Ball {
     public final static Ball INSTANCE = new Ball();
     private final int radius = 10;
@@ -101,8 +103,9 @@ public class Ball {
     }
 
     public GameField.Position move() {
-        positionX -= dVector.x * 8;
-        positionY -= dVector.y * 8;
+        double s = 0.3 * delay;
+        positionX -= dVector.x * s;
+        positionY -= dVector.y * s;
         return new GameField.Position(positionX, positionY);
     }
 }

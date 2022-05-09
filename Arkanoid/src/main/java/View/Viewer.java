@@ -5,7 +5,9 @@ import Model.Menu;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Viewer extends JFrame {
@@ -26,6 +28,10 @@ public class Viewer extends JFrame {
     private Image winImage;
     private Image loseImage;
     private Image gameFieldImage;
+    private Image tmp;
+    private Image redBlockImage;
+    private Image blueBlockImage;
+    private Image greenBlockImage;
 
     private Viewer() {
         setSize(BackField.WIDTH, BackField.HEIGHT);
@@ -44,19 +50,30 @@ public class Viewer extends JFrame {
         winImage = new ImageIcon("src/main/java/Pictures/win.png").getImage();
         loseImage = new ImageIcon("src/main/java/Pictures/lose.png").getImage();
         gameFieldImage = new ImageIcon("src/main/java/Pictures/FieldBlack.jpg").getImage();
+        redBlockImage = new ImageIcon("src/main/java/Pictures/redBlock.jpg").getImage();
+        greenBlockImage = new ImageIcon("src/main/java/Pictures/greenBlock.jpg").getImage();
+        blueBlockImage = new ImageIcon("src/main/java/Pictures/blueBlock.jpg").getImage();
+        tmp = new BufferedImage(BackField.WIDTH, BackField.HEIGHT, BufferedImage.TYPE_INT_RGB);
     }
 
     private void drawBlocks(Graphics g) {
-        for (int i = 0; i < BlockManager.COUNT; i++) {
-            Block block = blockManager.getBlock(i);
-            if(blockManager.getBlock(i).isLife()) {
-                g.drawImage(block.getImage(), block.getPositionX(), block.getPositionY(), this);
-            }
-        }
+        Arrays.stream(blockManager.getBlocks())
+                .filter(Block::isLife)
+                .forEach(block -> g.drawImage(getBlockImage(block), block.getPositionX(), block.getPositionY(), this));
+    }
+
+    private Image getBlockImage(Block block) {
+        return switch (block.getLives()) {
+            case 1 -> redBlockImage;
+            case 2 -> greenBlockImage;
+            case 3 -> blueBlockImage;
+            default -> null;
+        };
     }
 
     @Override
-    public void paint(Graphics g) {
+    public void paint(Graphics gg) {
+        Graphics g = tmp.getGraphics();
         if (mainMenu.isVisible()) {
             switch (mainMenu.getCondition()) {
                 case Menu.IN_REGISTRATION -> {
@@ -88,17 +105,13 @@ public class Viewer extends JFrame {
         else {
             g.setFont(font);
             g.setColor(Color.red);
-
-
             g.drawImage(gameFieldImage, 0, 0, this);
+            drawBlocks(g);
             g.drawImage(ballImage, (int)ball.getPositionX(), (int)ball.getPositionY(), this);
             g.drawImage(platformImage, platform.getPositionX(), platform.getPositionY(), this);
             g.drawString(BackField.INSTANCE.getScore().toString(), 550, 270);
-            drawBlocks(g);
-
-            g.setColor(Color.white);
-            g.fillRect(400, 450, 100, 100);
         }
+        gg.drawImage(tmp,0,0, this);
     }
 
     private void drawHighScoresTable(Graphics g, ArrayList<Registrator.Note> table) {
