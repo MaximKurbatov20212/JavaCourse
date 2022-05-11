@@ -34,36 +34,10 @@ public class Lexer {
         return lexer.getTokens();
     }
 
-    private Token getArray(String line) {
-        int len = getLen(line);
-
-        if(len == -1) return null;
-
-        StringBuilder result = new StringBuilder();
-        for(int i = curPos; i < curPos + len; i++) {
-            char c = line.charAt(i);
-
-            if(!isUTF8(c)) {
-                ErrorReporter.report(((Character) c).toString());
-                hasErrors = true;
-            }
-
-            result.append(c);
-        }
-        curPos = curPos + len;
-        return new Token(TokenType.STR, result.toString());
-    }
-
     private List<Token> scan(String line) {
         try {
             while (curPos < line.length()) {
                 char c = line.charAt(curPos);
-
-                if(!isUTF8(c)) {
-                    ErrorReporter.report(((Character) c).toString());
-                    hasErrors = true;
-                    curPos++;
-                }
 
                 // array
                 if (isDigit(c)) {
@@ -92,16 +66,16 @@ public class Lexer {
                 }
             }
         }
-        catch (Exception e) {
+        catch (IndexOutOfBoundsException e) {
+            ErrorReporter.report("Invalid string format. Number:string, but string has length less then number");
             return null;
         }
-
+        catch (Exception e) {
+            System.err.println("Something wrong");
+            return null;
+        }
         curPos = 0;
         return hasErrors ? null : tokens;
-    }
-
-    private boolean isUTF8(char c) {
-        return c <= 127;
     }
 
     private void addToken(Token token) {
@@ -121,6 +95,26 @@ public class Lexer {
         return Integer.parseInt(line.substring(start, curPos++));
     }
 
+    private Token getArray(String line) {
+        int len = getLen(line);
+
+        if (len == -1) return null;
+
+        StringBuilder result = new StringBuilder();
+        for (int i = curPos; i < curPos + len; i++) {
+            char c = line.charAt(i);
+
+            if (!isUTF8(c)) {
+                ErrorReporter.report(((Character) c).toString());
+                hasErrors = true;
+            }
+
+            result.append(c);
+        }
+        curPos = curPos + len;
+        return new Token(TokenType.STR, result.toString());
+    }
+
     private Token getNumber(String line) {
         char c;
         int start = ++curPos;
@@ -135,5 +129,9 @@ public class Lexer {
 
     private static boolean isDigit(char c) {
         return c >= '0' && c <= '9';
+    }
+
+    private boolean isUTF8(char c) {
+        return c <= 127;
     }
 }
