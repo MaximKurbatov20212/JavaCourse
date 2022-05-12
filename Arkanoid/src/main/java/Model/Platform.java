@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class Platform extends JFrame  {
     public final static Platform INSTANCE = new Platform();
-    private static final int OFFSET = 10; // Moved OFFSET pixels after pressed key
+    private static final int OFFSET = 5; // Moved OFFSET pixels after pressed key
 
     private static final int RIGHT_CODE = 39;
     private static final int LEFT_CODE = 37;

@@ -7,8 +7,6 @@ public class BackField {
     public static final int HEIGHT = 550;
     private static final int BALL_AREA_WIDTH = 490;
 
-    private Integer score = 0;
-
     public int getWidth() {
         return WIDTH;
     }
@@ -19,14 +17,6 @@ public class BackField {
 
     public int getAreaWidth() {
         return BALL_AREA_WIDTH;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(int i) {
-        score = i;
     }
 
     public int getWallWidth() {

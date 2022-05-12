@@ -31,21 +31,29 @@ public class GameStateHandler implements ActionListener {
     private final int ESC = 27;
     private final int EXIT = 4;
 
-    public static final double delay = 15;
+    public static final double gameDelay = 15;
+    public static final double menuDelay = 110;
 
     public int condition;
     private Timer timer;
 
     private final Menu mainMenu = Menu.getInstance();
+    private Registrator registrator;
 
     private GameStateHandler() {
+        try {
+            registrator = new Registrator();
+        }
+        catch (IOException e) {
+            System.err.println("Pls, don't delete HighScores.txt");
+        }
         condition = IN_REGISTRATION;
     }
 
     public void handleAction(int keyCode) {
         switch(condition) {
             case IN_REGISTRATION : {
-                registr();
+                registrate();
             }
             case IN_MAIN_MENU: {
                 switch (keyCode) {
@@ -63,7 +71,7 @@ public class GameStateHandler implements ActionListener {
             case(IN_GAME): {
                 switch(keyCode) {
                     case ESC -> goToMainMenu();
-                    case EXIT -> System.exit(0);
+                    case EXIT -> exitGame();
                     case RIGHT -> Platform.INSTANCE.move(RIGHT);
                     case LEFT -> Platform.INSTANCE.move(LEFT);
                 }
@@ -72,7 +80,7 @@ public class GameStateHandler implements ActionListener {
             case(STOP_THE_WORLD): {
                 if((keyCode == ESC || keyCode == ENTER)) {
                     GameField.INSTANCE.setWinner(GameField.Winner.NOBODY);
-                    Registrator.addToTable(BackField.INSTANCE.getScore());
+                    Registrator.addToTable(GameField.INSTANCE.getScore());
                     goToMainMenu();
                 }
             }
@@ -80,13 +88,17 @@ public class GameStateHandler implements ActionListener {
     }
 
     private void checkCursorPosition() {
-        int pos = Menu.getInstance().getCursorPosition();
-        switch (pos) {
+        int cursorPosition = Menu.getInstance().getCursorPosition();
+        switch (cursorPosition) {
             case Menu.Cursor.NEW_GAME -> startGame();
             case Menu.Cursor.HIGH_SCORES -> goToHighScoresMenu();
             case Menu.Cursor.ABOUT -> goToAboutMenu();
-            case Menu.Cursor.EXIT -> System.exit(0);
+            case Menu.Cursor.EXIT -> exitGame();
         }
+    }
+
+    private void exitGame() {
+        System.exit(0);
     }
 
     private void cursorUp() {
@@ -98,27 +110,25 @@ public class GameStateHandler implements ActionListener {
     }
 
     public void initGame() {
-        timer = new Timer((int) delay, this);
+        timer = new Timer((int) gameDelay, this);
         timer.start();
+
         Viewer.INSTANCE.addKeyListener(GameController.INSTANCE);
+        Viewer.INSTANCE.requestFocus();
+
         condition = IN_MAIN_MENU;
         mainMenu.setCondition(Menu.IN_MAIN_MENU);
     }
 
-    public void registr() {
+    public void registrate() {
         condition = IN_REGISTRATION;
         mainMenu.setCondition(Menu.IN_REGISTRATION);
         mainMenu.setVisible(true);
-        try {
-            Registrator registrator = new Registrator();
-            registrator.registrate();
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Pls, don't delete HighScore.txt");
-        }
+        registrator.registrate();
     }
 
     public void startGame() {
+        GameController.INSTANCE.setDelay(gameDelay);
         condition = IN_GAME;
         setStartPositions();
         Viewer.INSTANCE.repaint();
@@ -128,7 +138,7 @@ public class GameStateHandler implements ActionListener {
         Ball.INSTANCE.setPosition(250, 300);
         Ball.INSTANCE.setDirectingVector(0,-1);
         Platform.INSTANCE.setPosition(210);
-        BackField.INSTANCE.setScore(0);
+        GameField.INSTANCE.setScore(0);
 
         mainMenu.setCondition(Menu.IN_GAME);
         mainMenu.setVisible(false);
@@ -143,6 +153,7 @@ public class GameStateHandler implements ActionListener {
     }
 
     public void goToMainMenu() {
+        GameController.INSTANCE.setDelay(menuDelay);
         condition = IN_MAIN_MENU;
         mainMenu.setCondition(Menu.IN_MAIN_MENU);
         mainMenu.setVisible(true);
@@ -155,7 +166,10 @@ public class GameStateHandler implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(condition == IN_GAME) {
+        if(condition == IN_REGISTRATION) {
+            registrator.tryRegistrate();
+        }
+        else if(condition == IN_GAME) {
             GameField.INSTANCE.makeMove();
         }
         Viewer.INSTANCE.repaint();
