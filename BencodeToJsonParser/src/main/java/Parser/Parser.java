@@ -27,7 +27,7 @@ public class Parser {
         }
 
         catch (UnexpectedTokenException e) {
-            e.printErrorMessage();
+            ErrorReporter.report("Unexpected token: " + e.toString());
             return null;
         }
     }

@@ -59,7 +59,7 @@ public class Lexer {
                     case 'e' -> addToken(new Token(TokenType.END_BRACKET, ""));
 
                     default -> {
-                        ErrorReporter.report("Unknown char: " + c);
+                        ErrorReporter.report(unknownChar(line, curPos, c));
                         hasErrors = true;
                         curPos++;
                     }
@@ -67,16 +67,21 @@ public class Lexer {
             }
         }
         catch (IndexOutOfBoundsException e) {
-            ErrorReporter.report("Invalid string format. Number:string, but string has length less then number");
+            ErrorReporter.report(invalidLength(line, curPos));
+            return null;
+        }
+        catch (InvalidFormatException e) {
+            ErrorReporter.report(invalidFormat(line, curPos));
             return null;
         }
         catch (Exception e) {
-            System.err.println("Something wrong");
-            return null;
+            throw new AssertionError("Something wrong");
         }
+
         curPos = 0;
         return hasErrors ? null : tokens;
     }
+
 
     private void addToken(Token token) {
         tokens.add(token);
@@ -88,20 +93,23 @@ public class Lexer {
         int start = curPos;
         while ((c = line.charAt(curPos)) != ':') {
             if (!isDigit(c)) {
-                throw new InvalidFormatException("...");
+                throw new InvalidFormatException(line);
             }
             curPos++;
         }
         return Integer.parseInt(line.substring(start, curPos++));
     }
 
+
     private Token getArray(String line) {
         int len = getLen(line);
 
         if (len == -1) return null;
 
+        int pos = curPos;
+
         StringBuilder result = new StringBuilder();
-        for (int i = curPos; i < curPos + len; i++) {
+        for (int i = pos; i < pos + len; i++) {
             char c = line.charAt(i);
 
             if (!isUTF8(c)) {
@@ -111,7 +119,7 @@ public class Lexer {
 
             result.append(c);
         }
-        curPos = curPos + len;
+        curPos = pos + len;
         return new Token(TokenType.STR, result.toString());
     }
 
@@ -133,5 +141,29 @@ public class Lexer {
 
     private boolean isUTF8(char c) {
         return c <= 127;
+    }
+
+    private String unknownChar(String line, int pos, char c) {
+        return """
+                Unknown char '%c':
+                %s
+                %s^--- here
+                """.formatted(c, line, " ".repeat(pos));
+    }
+
+    private String invalidLength(String line, int pos) {
+        return """
+                Invalid length:
+                %s
+                %s^--- here
+                """.formatted(line, " ".repeat(pos - 2));
+    }
+
+    private String invalidFormat(String line, int pos) {
+        return """
+                Invalid symbol '%c':
+                %s
+                %s^--- here
+                """.formatted(line.charAt(pos), line, " ".repeat(pos));
     }
 }

@@ -21,9 +21,9 @@ public class Main {
 //        String str = "d 1:a d i1e e e"; // error
 //        String str = "d 1:a d 1:b i1e e e"; // ok
 //        String str = "d 1:a d 1:b i1e e e"; // ok
-//        String str = "d 1:a e"; // error
+        String str = "d i1e 2:we e"; // error
 //        String str = "d 1:a 1:b e"; // ok
-        String str = "100:afhafjksda "; // ok
+//        String str = "d 2:df 2:fs e m "; // ok
 //        String str = "d 1:a l i1e 3:abc 5:hello e e"; // ok
 //        String str = """
 //        d
@@ -42,12 +42,12 @@ public class Main {
 //                12:piece length i262144e
 //                6:pieces i123e
 //            e
-//        e""";
+//        e r""";
         BufferedReader br = new BufferedReader(new StringReader(str));
         Lexer lexer = new Lexer(br);
 
 //        Parser parser = new Parser(lexer.getTokens());
-        JsonPrinter printer = new JsonPrinter(Parser.parse(lexer.getTokens()));
-        printer.print();
+//        JsonPrinter printer = new JsonPrinter(Parser.parse(lexer.getTokens()));
+        System.out.println(JsonPrinter.print(Parser.parse(lexer.getTokens())));
     }
 }

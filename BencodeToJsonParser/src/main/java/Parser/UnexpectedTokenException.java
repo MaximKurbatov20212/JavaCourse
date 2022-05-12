@@ -16,4 +16,9 @@ public class UnexpectedTokenException extends Exception {
     Token getToken() {
         return token;
     }
+
+    @Override
+    public String toString() {
+        return token.toString();
+    }
 }

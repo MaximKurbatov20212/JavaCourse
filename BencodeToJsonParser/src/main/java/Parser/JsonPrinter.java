@@ -18,7 +18,8 @@ public class JsonPrinter {
     public static String print(Expr string) {
         result.delete(0, result.length());
 
-        if(string == null) return "{\n}";
+        if(string == null) return null;
+
         printBExpr(string);
         return result.toString();
     }
@@ -32,20 +33,12 @@ public class JsonPrinter {
     }
 
     private static void printBExpr(Expr expr) {
-        if(expr instanceof Expr.BString) {
-            printBString((Expr.BString) expr);
-        }
-        else if(expr instanceof Expr.BNumber) {
-            printBNumber((Expr.BNumber) expr);
-        }
-        else if(expr instanceof Expr.BDict) {
-            printBDict((Expr.BDict) expr);
-        }
-        else if(expr instanceof Expr.BList) {
-            printBList((Expr.BList) expr);
-        }
-        else {
-            throw new RuntimeException();
+        switch (expr) {
+            case Expr.BString bString -> printBString(bString);
+            case Expr.BNumber bNumber -> printBNumber(bNumber);
+            case Expr.BDict bDict -> printBDict(bDict);
+            case Expr.BList bList -> printBList(bList);
+            case null, default -> throw new RuntimeException();
         }
     }
 
