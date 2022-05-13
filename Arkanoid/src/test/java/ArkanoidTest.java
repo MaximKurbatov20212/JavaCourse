@@ -69,7 +69,7 @@ public class ArkanoidTest {
 
         for(int lives = 1; lives <= 3; lives++) {
             gameField.fillField(1, lives, blockPosition);
-            ball.setDirectingVector(1, 0);
+            ball.setDirectingVector(-1, 0);
             ball.setPosition(ballPosition);
 
             gameField.makeMove();
@@ -84,7 +84,7 @@ public class ArkanoidTest {
 
         for(int lives = 1; lives <= 3; lives++) {
             gameField.fillField(1, lives, blockPosition);
-            ball.setDirectingVector(-1, 0);
+            ball.setDirectingVector(1, 0);
             ball.setPosition(ballPosition);
 
             gameField.makeMove();

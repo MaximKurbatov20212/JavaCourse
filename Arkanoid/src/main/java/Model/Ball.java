@@ -5,6 +5,7 @@ import static Controller.GameStateHandler.gameDelay;
 public class Ball {
     public final static Ball INSTANCE = new Ball();
     public static final int RADIUS = 10;
+
     private double positionX = 200;
     private double positionY = 450;
 
@@ -67,8 +68,9 @@ public class Ball {
     public void platformReflect() {
         Platform platform = Platform.INSTANCE;
         double halfWidth = (double) Platform.LEN_OF_PLATFORM / 2;
-        double x = halfWidth - (getBallCenterX() - platform.getPositionX());
+        double x = -halfWidth + (getBallCenterX() - platform.getPositionX());
         double y = Math.sqrt(Math.abs(halfWidth * halfWidth - x * x));
+
         dVector.x = x;
         dVector.y = y;
         dVector.norm();
@@ -81,6 +83,14 @@ public class Ball {
     public void setPosition(GameField.Position position) {
         positionX = position.x();
         positionY = position.y();
+    }
+
+    public double getVectorX() {
+        return dVector.x;
+    }
+
+    public double getVectorY() {
+        return dVector.y;
     }
 
     private static class DirectingVector {
@@ -107,7 +117,8 @@ public class Ball {
     }
 
     public GameField.Position move() {
-        positionX -= dVector.x * STEP;
+        dVector.norm();
+        positionX += dVector.x * STEP;
         positionY -= dVector.y * STEP;
         return new GameField.Position(positionX, positionY);
     }

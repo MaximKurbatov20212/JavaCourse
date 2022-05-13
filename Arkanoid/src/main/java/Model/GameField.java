@@ -170,15 +170,17 @@ public class GameField {
 
 
     boolean ballHitsBlockAbove(Position position, Block block) {
-        return block.getPositionX() < position.x + Block.HEIGHT &&
-                block.getPositionX() + Block.WIDTH > position.x &&
+        return  block.getPositionX() + Block.WIDTH + Ball.EPS > position.x &&
+                block.getPositionX() - Ball.EPS < position.x + 2 * Ball.RADIUS &&
+
                 block.getPositionY() - Ball.EPS < position.y + 2 * Ball.RADIUS &&
                 block.getPositionY() + Ball.EPS > position.y + 2 * Ball.RADIUS;
     }
 
     boolean ballHitsBlockBelow(Position position, Block block) {
-        return block.getPositionX() < position.x + block.getHeight() &&
-                block.getPositionX() + Block.WIDTH > position.x &&
+        return  block.getPositionX() + Block.WIDTH + Ball.EPS > position.x &&
+                block.getPositionX() - Ball.EPS < position.x + 2 * Ball.RADIUS &&
+
                 block.getPositionY() + Block.HEIGHT - Ball.EPS < position.y &&
                 block.getPositionY() + Block.HEIGHT + Ball.EPS >= position.y;
     }
