@@ -21,6 +21,12 @@ public class Block extends JFrame {
         }
     }
 
+    public Block(int x, int y, int lives) {
+        positionX = x;
+        positionY = y;
+        this.numberOfLives = lives;
+    }
+
     public int getPositionX() {
         return positionX;
     }

@@ -17,8 +17,9 @@ public class Viewer extends JFrame {
     private final Menu mainMenu = Menu.INSTANCE;
     private final GameField gameField = GameField.INSTANCE;
     private final Ball ball = Ball.INSTANCE;
-    private final BlockManager blockManager = BlockManager.INSTANCE;
-    private final Font font = new Font("Fixedsys Regular", Font.PLAIN, 40);
+//    private final BlockManager blockManager = BlockManager.INSTANCE;
+
+    private final Font tableFont = new Font("Fixedsys Regular", Font.PLAIN, 40);
     private final Font statisticFont = new Font("Fixedsys Regular", Font.BOLD, 40);
 
     private Image ballImage;
@@ -63,7 +64,7 @@ public class Viewer extends JFrame {
     }
 
     private void drawBlocks(Graphics g) {
-        Arrays.stream(blockManager.getBlocks())
+        Arrays.stream(gameField.getBlocks())
                 .filter(Block::isLife)
                 .forEach(block -> g.drawImage(getBlockImage(block), block.getPositionX(), block.getPositionY(), this));
     }
@@ -90,9 +91,11 @@ public class Viewer extends JFrame {
         }
 
         else if(gameField.PlayerWin()) {
+            drawGameField(g);
             g.drawImage(winImage, 0,0,this);
         }
         else if(gameField.ComputerWin()) {
+            drawGameField(g);
             g.drawImage(loseImage, 0,0,this);
         }
         else {
@@ -116,8 +119,8 @@ public class Viewer extends JFrame {
         drawBlocks(g);
         g.drawImage(ballImage, (int)ball.getPositionX(), (int)ball.getPositionY(), this);
         g.drawImage(platformImage, platform.getPositionX(), platform.getPositionY(), this);
-        g.drawString(GameField.INSTANCE.getScore().toString(), 550, 270);
-        g.drawString(((Integer)gameField.getRound()).toString(), 580, 530);
+        g.drawString(GameField.INSTANCE.getScore().toString(), 560, 270);
+        g.drawString(((Integer) gameField.getRound()).toString(), 580, 510);
     }
 
     private void drawMainMenu(Graphics g) {
@@ -127,7 +130,7 @@ public class Viewer extends JFrame {
 
     private void drawHighScoresMenu(Graphics g) {
         g.drawImage(recordsImage, 0, 0, this);
-        g.setFont(font);
+        g.setFont(tableFont);
         g.setColor(Color.black);
         drawHighScoresTable(g, (ArrayList<Registrator.Note>) Registrator.table);
     }
@@ -141,6 +144,6 @@ public class Viewer extends JFrame {
                 .sorted((n1, n2) -> n2.score().compareTo(n1.score()))
                 .toList()
                 .subList(0, Math.min(table.size(), 8))
-                .forEach(note -> g.drawString(i.toString() + ") " + note.name() + " : " + note.score(), 100 , 100 + (i.getAndIncrement()) * getFontMetrics(font).getHeight()));
+                .forEach(note -> g.drawString(i.toString() + ") " + note.name() + " : " + note.score(), 100 , 100 + (i.getAndIncrement()) * getFontMetrics(tableFont).getHeight()));
     }
 }

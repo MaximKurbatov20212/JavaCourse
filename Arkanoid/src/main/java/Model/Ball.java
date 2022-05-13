@@ -8,7 +8,7 @@ public class Ball {
     private double positionX = 200;
     private double positionY = 450;
 
-    public static final double STEP = 0.3 * gameDelay;
+    public static final double STEP = 0.25 * gameDelay;
     public static final double EPS = STEP;
 
     private Ball() {}
@@ -23,16 +23,16 @@ public class Ball {
 
     public void reflect(Block block) {
         GameField gameField = GameField.INSTANCE;
-        if (gameField.ballHitsBlockRight(new GameField.Position(positionX, positionY), block)) {
-            setDirectingVector(-dVector.x, dVector.y);
-        } else if (gameField.ballHitsBlockLeft(new GameField.Position(positionX, positionY), block)) {
-            setDirectingVector(-dVector.x, dVector.y);
-        }
-        else if (gameField.ballHitsBlockBelow(new GameField.Position(positionX, positionY), block)) {
+        if (gameField.ballHitsBlockBelow(new GameField.Position(positionX, positionY), block)) {
             setDirectingVector(dVector.x, -dVector.y);
         }
         else if (gameField.ballHitsBlockAbove(new GameField.Position(positionX, positionY), block)) {
             setDirectingVector(dVector.x, -dVector.y);
+        }
+        else if (gameField.ballHitsBlockRight(new GameField.Position(positionX, positionY), block)) {
+            setDirectingVector(-dVector.x, dVector.y);
+        } else if (gameField.ballHitsBlockLeft(new GameField.Position(positionX, positionY), block)) {
+            setDirectingVector(-dVector.x, dVector.y);
         }
     }
 
@@ -64,10 +64,9 @@ public class Ball {
         return positionY <= 10;
     }
 
-
     public void platformReflect() {
         Platform platform = Platform.INSTANCE;
-        double halfWidth = (double)platform.getLen() / 2;
+        double halfWidth = (double) Platform.LEN_OF_PLATFORM / 2;
         double x = halfWidth - (getBallCenterX() - platform.getPositionX());
         double y = Math.sqrt(Math.abs(halfWidth * halfWidth - x * x));
         dVector.x = x;
@@ -77,6 +76,11 @@ public class Ball {
 
     private double getBallCenterX() {
         return positionX + RADIUS;
+    }
+
+    public void setPosition(GameField.Position position) {
+        positionX = position.x();
+        positionY = position.y();
     }
 
     private static class DirectingVector {

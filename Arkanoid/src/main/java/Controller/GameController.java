@@ -4,15 +4,15 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.HashSet;
 
+import static Controller.GameStateHandler.*;
 import static Controller.GameStateHandler.menuDelay;
 
 public class GameController extends KeyAdapter {
     public static final GameController INSTANCE = new GameController();
+
     private final GameStateHandler gameHandler = GameStateHandler.INSTANCE;
-
-    Timer timer;
-
-    HashSet<Integer> pressedKeys = new HashSet<>();
+    private final Timer timer;
+    private final HashSet<Integer> pressedKeys = new HashSet<>();
 
     private GameController() {
         timer = new Timer((int) menuDelay, action -> {
@@ -31,9 +31,13 @@ public class GameController extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // gameHandler.handleAction(pressedKey);  <-  delayed registration  https://stackoverflow.com/questions/12102619/java-keylistener-is-delayed-registration
-        pressedKeys.add(e.getKeyCode());
+        if(gameHandler.condition == IN_GAME) {
+            pressedKeys.add(e.getKeyCode());
+        } else {
+             gameHandler.handleAction(e.getKeyCode());
+        }
     }
+
     @Override
     public void keyReleased(KeyEvent e){
         pressedKeys.remove(e.getKeyCode());

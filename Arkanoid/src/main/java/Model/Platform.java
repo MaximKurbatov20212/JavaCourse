@@ -1,7 +1,6 @@
 package Model;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class Platform extends JFrame  {
     public final static Platform INSTANCE = new Platform();
@@ -13,41 +12,55 @@ public class Platform extends JFrame  {
     public static final int LEN_OF_PLATFORM = 80;
     public static final int HEIGHT_OF_PLATFORM = 13;
 
-    private Image platformImage;
     private int positionX;
     private final int positionY;
 
-    private int direction; // 37 - left, 39 right, 0 - stand
+    private final Direction direction = Direction.STAND;
 
-    private void loadImage() {
-        ImageIcon iplatform = new ImageIcon("src/main/java/Pictures/platform.png");
-        platformImage = iplatform.getImage().getScaledInstance(LEN_OF_PLATFORM, HEIGHT_OF_PLATFORM, Image.SCALE_DEFAULT);
-    }
-
-    // CR: create in GameField
     private Platform() {
-        loadImage();
         positionX = BackField.INSTANCE.getWidth() / 2;
         positionY = BackField.INSTANCE.getHeight() - HEIGHT - 50;
     }
 
-//    CR:
-//    enum Direction {
-//        LEFT,
-//        RIGHT
-//    }
-    public void move(int direction) {
-        if (direction == RIGHT_CODE && positionX + LEN_OF_PLATFORM < BackField.INSTANCE.getAreaWidth()) {
+    enum Direction {
+        LEFT,
+        RIGHT,
+        STAND
+    }
+
+    public void move(int keyCode) {
+        Direction direction = interpretDirection(keyCode);
+        if(direction == null) return;
+
+        if (direction == Direction.RIGHT && positionX + LEN_OF_PLATFORM < BackField.INSTANCE.getAreaWidth()) {
             positionX += OFFSET;
         }
 
-        else if (direction == LEFT_CODE  && positionX > BackField.INSTANCE.getWallWidth()) {
+        else if (direction == Direction.LEFT  && positionX > BackField.INSTANCE.getWallWidth()) {
             positionX -= OFFSET;
         }
     }
 
-    public Image getImage() {
-        return platformImage;
+
+    private Direction interpretDirection(int keyCode) {
+        switch (keyCode) {
+            case RIGHT_CODE -> {
+                return Direction.RIGHT;
+            }
+            case LEFT_CODE -> {
+                return Direction.LEFT;
+            }
+            case 0 -> {
+                return Direction.STAND;
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    public void setPosition(int i) {
+        positionX = i;
     }
 
     public int getPositionX() {
@@ -56,17 +69,5 @@ public class Platform extends JFrame  {
 
     public int getPositionY() {
         return positionY;
-    }
-
-    public int getDirection() {
-        return direction;
-    }
-
-    public int getLen() {
-        return LEN_OF_PLATFORM;
-    }
-
-    public void setPosition(int i) {
-        positionX = i;
     }
 }

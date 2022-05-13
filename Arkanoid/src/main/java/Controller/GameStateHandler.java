@@ -15,11 +15,11 @@ public class GameStateHandler implements ActionListener {
     public static final GameStateHandler INSTANCE = new GameStateHandler();
 
     // Conditions of Controller.GameStateHandler
-    private final int IN_REGISTRATION = -1;
-    private final int IN_GAME = 1;
-    private final int IN_ABOUT_MENU = 3;
-    private final int IN_HIGH_SCORES_MENU = 2;
-    private final int IN_MAIN_MENU = 0;
+    public static final int IN_REGISTRATION = -1;
+    public static final int IN_GAME = 1;
+    public static final int IN_ABOUT_MENU = 3;
+    public static final int IN_HIGH_SCORES_MENU = 2;
+    public static final int IN_MAIN_MENU = 0;
     public static final int STOP_THE_WORLD = 4;
 
     // Codes of > < symbols
@@ -32,7 +32,7 @@ public class GameStateHandler implements ActionListener {
     private final int EXIT = 4;
 
     public static final double gameDelay = 15;
-    public static final double menuDelay = 110;
+    public static final double menuDelay = 120;
 
     public int condition;
     private Timer timer;
@@ -98,6 +98,7 @@ public class GameStateHandler implements ActionListener {
     }
 
     private void exitGame() {
+        Registrator.writeNewRecords();
         System.exit(0);
     }
 
@@ -144,7 +145,7 @@ public class GameStateHandler implements ActionListener {
         mainMenu.setVisible(false);
 
         GameField.INSTANCE.setWinner(NOBODY);
-        BlockManager.INSTANCE.fillField();
+        GameField.INSTANCE.fillField();
     }
 
     public void goToAboutMenu() {
