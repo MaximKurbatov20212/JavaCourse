@@ -10,10 +10,30 @@ import java.util.*;
 import java.util.List;
 
 
+/*
+
+View (name was entered):
+    - invoke controller, pass name()
+    - controller has field playerName
+    - validate name from view, if (badName) view.showProblem()
+    - if (!badName) playerName = name
+
+Controller (game ended):
+    if (gameEnd()) {
+        // TODO: singleton
+        RecordManager recordManager = new ...;
+        recordManager.addRecord(model.getResult());
+    }
+
+Controller(show records):
+    - List<Record> records = RecordManager.getInstance().getCurrentRecords();
+    - view.showRecords(records);
+ */
+
 public class Registrator {
     private final Container c;
     private final JTextField registrationField = new JTextField(15);
-    private static FileWriter Writer;
+    private static FileWriter writer;
 
     private static String name;
     private final boolean wasRegistrate = false;
@@ -85,15 +105,15 @@ public class Registrator {
 
     public static void writeNewRecords() {
         try {
-            Writer = new FileWriter("src/main/java/Pictures/HighScores.txt");
-            Writer.write(""); // delete all in the file
-            Writer.close();
+            writer = new FileWriter("src/main/java/Pictures/HighScores.txt");
+            writer.write(""); // delete all in the file
+            writer.close();
 
-            Writer = new FileWriter("src/main/java/Pictures/HighScores.txt", true);
+            writer = new FileWriter("src/main/java/Pictures/HighScores.txt", true);
             for(Note note : table) {
-                Writer.append(note.toString()).append("\n");
+                writer.append(note.toString()).append("\n");
             }
-            Writer.close();
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

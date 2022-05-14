@@ -10,6 +10,7 @@ public class Ball {
     private double positionY = 450;
 
     public static final double STEP = 0.25 * gameDelay;
+    // CR: move to block, make const
     public static final double EPS = STEP;
 
     private Ball() {}
@@ -20,6 +21,14 @@ public class Ball {
         dVector.x = x;
         dVector.y = y;
         dVector.norm();
+    }
+
+
+    public void reflect(HitType hitType) {
+        switch (hitType) {
+            case RIGHT, LEFT -> setDirectingVector(-dVector.x, dVector.y);
+            case UP, DOWN -> setDirectingVector(dVector.x, -dVector.y);
+        }
     }
 
     public void reflect(Block block) {
@@ -95,7 +104,7 @@ public class Ball {
 
     private static class DirectingVector {
         private double x;
-        private double y = 1.0f;
+        private double y = -1.0f;
 
         public void norm() {
             x = x / Math.sqrt(x*x + y*y);

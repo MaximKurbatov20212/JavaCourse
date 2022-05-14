@@ -1,5 +1,13 @@
 package Model;
 
+
+// enter -> invoke controller from view (as listener) onMenuItem(menuItem)
+enum MenuItem {
+    PLAY,
+    RECORDS,
+    ABOUT
+    // ....
+}
 public class Menu {
     public static Menu INSTANCE = new Menu();
 

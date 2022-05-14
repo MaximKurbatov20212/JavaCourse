@@ -65,7 +65,7 @@ public class Viewer extends JFrame {
 
     private void drawBlocks(Graphics g) {
         Arrays.stream(gameField.getBlocks())
-                .filter(Block::isLife)
+                .filter(Block::isAlive)
                 .forEach(block -> g.drawImage(getBlockImage(block), block.getPositionX(), block.getPositionY(), this));
     }
 
@@ -90,11 +90,11 @@ public class Viewer extends JFrame {
             }
         }
 
-        else if(gameField.PlayerWin()) {
+        else if(gameField.playerWin()) {
             drawGameField(g);
             g.drawImage(winImage, 0,0,this);
         }
-        else if(gameField.ComputerWin()) {
+        else if(gameField.computerWin()) {
             drawGameField(g);
             g.drawImage(loseImage, 0,0,this);
         }

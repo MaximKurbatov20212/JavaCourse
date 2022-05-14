@@ -1,8 +1,7 @@
 package Model;
 
-import javax.swing.*;
 
-public class Block extends JFrame {
+public class Block {
     public static final int HEIGHT = 20;
     public static final int WIDTH = 80;
     private final int positionX;
@@ -10,6 +9,7 @@ public class Block extends JFrame {
 
     private int numberOfLives;
 
+    // CR: remove
     public Block(int x, int y) {
         positionX = x;
         positionY = y;
@@ -27,6 +27,10 @@ public class Block extends JFrame {
         this.numberOfLives = lives;
     }
 
+//    HitType hit(double x, double y) {
+//        return HitType.LEFT;
+//    }
+
     public int getPositionX() {
         return positionX;
     }
@@ -35,7 +39,7 @@ public class Block extends JFrame {
         return positionY;
     }
 
-    public boolean isLife() {
+    public boolean isAlive() {
         return numberOfLives > 0;
     }
 
@@ -43,6 +47,7 @@ public class Block extends JFrame {
         numberOfLives--;
     }
 
+    // CR: remove
     public int getLives() {
         return numberOfLives;
     }
