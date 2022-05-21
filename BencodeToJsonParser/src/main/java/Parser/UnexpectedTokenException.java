@@ -9,14 +9,6 @@ public class UnexpectedTokenException extends Exception {
         this.token = token;
     }
 
-     void printErrorMessage() {
-        System.err.println("Unexpected token " + token.toString());
-    }
-
-    Token getToken() {
-        return token;
-    }
-
     @Override
     public String toString() {
         return token.toString();

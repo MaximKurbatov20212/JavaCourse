@@ -3,68 +3,52 @@ package Parser;
 import java.util.List;
 
 sealed public interface Expr {
+    String toString(int shifts);
+    int shift = 4;
 
     record BString(String value) implements Expr {
-        @Override
-        public String toString() {
+        public String toString(int shifts) {
             return "\"" + value + "\"";
         }
     }
 
     record BNumber(int value) implements Expr {
-        @Override
-        public String toString() {
-            return String.valueOf(value);
+        public String toString(int shifts) {
+            return  String.valueOf(value);
         }
     }
 
     record BEntry(BString left, Expr right) implements Expr {
-        @Override
-        public String toString() {
-            return left.toString() + " : " + right.toString();
+        public String toString(int shifts) {
+            return left.toString(shifts) + " : " + right.toString(shifts);
         }
     }
 
     record BList(List<Expr> list) implements Expr {
-        @Override
-        public String toString() {
-            JsonPrinter.curNesting++;
+        public String toString(int shifts) {
+            if(list.size() == 0) return "[\n" + Expr.printShifts(shifts) +  "]";
 
             StringBuilder result = new StringBuilder("[\n");
-            for(Expr expr : list) {
-                result.append(JsonPrinter.printShifts()).append(expr.toString()).append(",\n");
+            for(int i = 0; i < list.size(); i++) {
+                result.append(printShifts(shifts + shift)).append(list.get(i).toString(shifts + shift)).append((i == list.size() - 1) ? "\n" : ",\n");
             }
-
-            deleteLastComma(result);
-            JsonPrinter.curNesting--;
-            appendClosingBracket(result, "]");
-            return result.toString();
+            return result.append(printShifts(shifts)).append("]").toString();
         }
     }
 
     record BDict(List<BEntry> list) implements Expr {
-        @Override
-        public String toString() {
+        public String toString(int shifts) {
+            if (list.size() == 0) return "{\n" + Expr.printShifts(shifts) + "\n}";
+
             StringBuilder result = new StringBuilder("{\n");
-            JsonPrinter.curNesting++;
-
-            for(BEntry bentry : list) {
-                result.append(JsonPrinter.printShifts()).append(bentry.toString()).append(",\n");
+            for (int i = 0; i < list.size(); i++) {
+                result.append(printShifts(shifts + shift)).append(list.get(i).toString(shifts + shift)).append((i == list.size() - 1) ? "\n" : ",\n");
             }
-
-            deleteLastComma(result);
-            JsonPrinter.curNesting--;
-            appendClosingBracket(result, "}");
-            return result.toString();
+            return result.append(printShifts(shifts)).append("}").toString();
         }
     }
 
-    private static void appendClosingBracket(StringBuilder string, String s) {
-        string.append("\n").append(JsonPrinter.printShifts()).append(s);
-    }
-
-    private static void deleteLastComma(StringBuilder result) {
-        if(!result.substring(result.length() - 2, result.length()).equals(",\n")) return; // if list is empty
-        result.delete(result.length() - 2, result.length()); // delete last ",\n"
+    private static String printShifts(int shifts) {
+        return " ".repeat(shifts);
     }
 }

@@ -28,7 +28,7 @@ public class IntegrationTest {
     public void emptyDictionary() throws IOException {
         String str = "d e"; // ok
         String rightAnswer = "{\n\n}";
-        assertEquals(parse((scan(str))), rightAnswer);
+        assertEquals(rightAnswer, parse((scan(str))));
     }
 
     @Test
@@ -37,10 +37,9 @@ public class IntegrationTest {
         String rightAnswer = """
         {
             "emptyList" : [
-            
             ]
         }""";
-        assertEquals(parse((scan(str))), rightAnswer);
+        assertEquals(rightAnswer, parse((scan(str))));
     }
 
     @Test
@@ -50,7 +49,7 @@ public class IntegrationTest {
         {
             "a" : 1
         }""";
-        assertEquals(parse((scan(str))), rightAnswer);
+        assertEquals(rightAnswer, parse((scan(str))));
     }
 
     @Test
@@ -91,6 +90,17 @@ public class IntegrationTest {
         String rightAnswer = """
         {
             "spaces...." : "spaces...."
+        }""";
+        assertEquals(rightAnswer, parse((scan(str))));
+    }
+
+    @Test
+    public void changeCollocation() throws IOException {
+        String str = "d 1:b i1e 1:a i2e e"; // ok
+        String rightAnswer = """
+        {
+            "a" : 2,
+            "b" : 1
         }""";
         assertEquals(rightAnswer, parse((scan(str))));
     }

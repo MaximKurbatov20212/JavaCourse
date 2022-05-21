@@ -4,6 +4,7 @@ import Lexer.Token;
 import Reporter.ErrorReporter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static Lexer.TokenType.*;
@@ -27,7 +28,7 @@ public class Parser {
         }
 
         catch (UnexpectedTokenException e) {
-            ErrorReporter.report("Unexpected token: " + e.toString());
+            ErrorReporter.report("Unexpected token: " + e);
             return null;
         }
     }
@@ -65,6 +66,9 @@ public class Parser {
         while(!isEndToken()) {
             entries.add((Expr.BEntry)parseBEntry());
         }
+
+        entries.sort((o1, o2) -> o1.left().value().compareTo(o2.left().value()));
+
         consume();
         return new Expr.BDict(entries);
     }
