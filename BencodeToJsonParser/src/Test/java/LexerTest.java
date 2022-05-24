@@ -38,14 +38,14 @@ public class LexerTest {
 
     @Test
     public void emptyDict() throws IOException {
-        assertTypes(scan("d e"), TokenType.START_DICT, TokenType.END_BRACKET, TokenType.EOF);
-        assertTypes(scan("de"), TokenType.START_DICT, TokenType.END_BRACKET, TokenType.EOF);
+        assertTypes(scan("d e"), TokenType.START_DICT, TokenType.END_ELEMENT, TokenType.EOF);
+        assertTypes(scan("de"), TokenType.START_DICT, TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test
     public void emptyList() throws IOException {
-        assertTypes(scan("l e"), TokenType.START_LIST, TokenType.END_BRACKET, TokenType.EOF);
-        assertTypes(scan("le"), TokenType.START_LIST, TokenType.END_BRACKET, TokenType.EOF);
+        assertTypes(scan("l e"), TokenType.START_LIST, TokenType.END_ELEMENT, TokenType.EOF);
+        assertTypes(scan("le"), TokenType.START_LIST, TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test
@@ -54,19 +54,19 @@ public class LexerTest {
         assertTypes(scan("l"), TokenType.START_LIST, TokenType.EOF);
         assertTypes(scan("i1e"), TokenType.NUM, TokenType.EOF);
         assertTypes(scan("5:hello"), TokenType.STR, TokenType.EOF);
-        assertTypes(scan("e"), TokenType.END_BRACKET, TokenType.EOF);
+        assertTypes(scan("e"), TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test
     public void dict() throws IOException {
-        assertTypes(scan("d 1:a i1e e"), TokenType.START_DICT, TokenType.STR, TokenType.NUM, TokenType.END_BRACKET, TokenType.EOF);
-        assertTypes(scan("d1:ai1ee"), TokenType.START_DICT, TokenType.STR, TokenType.NUM, TokenType.END_BRACKET, TokenType.EOF);
+        assertTypes(scan("d 1:a i1e e"), TokenType.START_DICT, TokenType.STR, TokenType.NUM, TokenType.END_ELEMENT, TokenType.EOF);
+        assertTypes(scan("d1:ai1ee"), TokenType.START_DICT, TokenType.STR, TokenType.NUM, TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test
     public void correctDict() throws IOException {
-        assertTypes(scan("d 1:a l i1e e e"), TokenType.START_DICT, TokenType.STR, TokenType.START_LIST, TokenType.NUM, TokenType.END_BRACKET, TokenType.END_BRACKET, TokenType.EOF);
-        assertTypes(scan("d1:ali1eee"), TokenType.START_DICT, TokenType.STR, TokenType.START_LIST, TokenType.NUM, TokenType.END_BRACKET, TokenType.END_BRACKET, TokenType.EOF);
+        assertTypes(scan("d 1:a l i1e e e"), TokenType.START_DICT, TokenType.STR, TokenType.START_LIST, TokenType.NUM, TokenType.END_ELEMENT, TokenType.END_ELEMENT, TokenType.EOF);
+        assertTypes(scan("d1:ali1eee"), TokenType.START_DICT, TokenType.STR, TokenType.START_LIST, TokenType.NUM, TokenType.END_ELEMENT, TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test

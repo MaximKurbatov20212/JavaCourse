@@ -21,13 +21,13 @@ public class ParserTest {
 
     @Test
     public void emptyDict() {
-        Expr expr = parse(tokens(new TokenInfo(START_DICT, ""), new TokenInfo(END_BRACKET, "")));
+        Expr expr = parse(tokens(new TokenInfo(START_DICT, ""), new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNotNull(expr);
     }
 
     @Test
     public void Dict() {
-        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(STR, "maxwell"), new TokenInfo(END_BRACKET, "")));
+        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(STR, "maxwell"), new TokenInfo(END_ELEMENT, "")));
         List<BEntry> list = new ArrayList<>();
         list.add(new BEntry(new BString("hello"), new BString("maxwell")));
         Assertions.assertEquals(new BDict(list), expr);
@@ -35,7 +35,7 @@ public class ParserTest {
 
     @Test
     public void List() {
-        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"), new TokenInfo(STR, "maxwell"),  new TokenInfo(END_BRACKET, ""), new TokenInfo(END_BRACKET, "")));
+        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"), new TokenInfo(STR, "maxwell"),  new TokenInfo(END_ELEMENT, ""), new TokenInfo(END_ELEMENT, "")));
 
         List<BEntry> listEntries = new ArrayList<>();
         List<Expr> listExpr = new ArrayList<>();
@@ -48,7 +48,7 @@ public class ParserTest {
 
     @Test
     public void emptyList() {
-        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"),  new TokenInfo(END_BRACKET, ""), new TokenInfo(END_BRACKET, "")));
+        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"),  new TokenInfo(END_ELEMENT, ""), new TokenInfo(END_ELEMENT, "")));
 
         List<BEntry> listEntries = new ArrayList<>();
         List<Expr> listExpr = new ArrayList<>();
@@ -60,29 +60,29 @@ public class ParserTest {
 
     @Test
     public void tooManyEndBrackets() {
-        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"), new TokenInfo(STR, "maxwell"),  new TokenInfo(END_BRACKET, ""), new TokenInfo(END_BRACKET, ""),  new TokenInfo(END_BRACKET, "")));
+        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"), new TokenInfo(STR, "maxwell"),  new TokenInfo(END_ELEMENT, ""), new TokenInfo(END_ELEMENT, ""),  new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
 
-        expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(END_BRACKET, ""), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"), new TokenInfo(STR, "maxwell"),  new TokenInfo(END_BRACKET, ""), new TokenInfo(END_BRACKET, ""),  new TokenInfo(END_BRACKET, "")));
+        expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(END_ELEMENT, ""), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"), new TokenInfo(STR, "maxwell"),  new TokenInfo(END_ELEMENT, ""), new TokenInfo(END_ELEMENT, ""),  new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
     }
 
     @Test
     public void InvalidBEntryFormat() {
         // Unexpected token Token[type=NUM, value=1234]
-        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(NUM, "1234"), new TokenInfo(STR, "hello"),new TokenInfo(END_BRACKET, "")));
+        Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(NUM, "1234"), new TokenInfo(STR, "hello"),new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
 
         // Unexpected token Token[type=END_BRACKET, value=]
-        expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(END_BRACKET, "")));
+        expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
 
         // Unexpected token Token[type=START_LIST, value=]
-        expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(START_LIST, ""), new TokenInfo(END_BRACKET, ""), new TokenInfo(STR, "hello"), new TokenInfo(END_BRACKET, "")));
+        expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(START_LIST, ""), new TokenInfo(END_ELEMENT, ""), new TokenInfo(STR, "hello"), new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
 
         // Unexpected token Token[type=START_DICT, value=]
-        expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(START_DICT, ""), new TokenInfo(END_BRACKET, ""), new TokenInfo(STR, "hello"), new TokenInfo(END_BRACKET, "")));
+        expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(START_DICT, ""), new TokenInfo(END_ELEMENT, ""), new TokenInfo(STR, "hello"), new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
     }
 
@@ -91,7 +91,7 @@ public class ParserTest {
         Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "inner1"),
                 new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "inner2"),
                 new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "inner3"), new TokenInfo(STR, "end"),
-                new TokenInfo(END_BRACKET, ""), new TokenInfo(END_BRACKET, ""), new TokenInfo(END_BRACKET, "")));
+                new TokenInfo(END_ELEMENT, ""), new TokenInfo(END_ELEMENT, ""), new TokenInfo(END_ELEMENT, "")));
 
         List<BEntry> listEntriesInner1 = new ArrayList<>();
         List<BEntry> listEntriesInner2 = new ArrayList<>();

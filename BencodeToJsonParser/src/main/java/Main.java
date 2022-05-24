@@ -43,11 +43,13 @@ public class Main {
 //                6:pieces i123e
 //            e
 //        e r""";
+        // CR: read from file, write to console or file (see document with task for more info)
         BufferedReader br = new BufferedReader(new StringReader(str));
         Lexer lexer = new Lexer(br);
 
 //        Parser parser = new Parser(lexer.getTokens());
 //        JsonPrinter printer = new JsonPrinter(Parser.parse(lexer.getTokens()));
+        // CR: NullPointerException if lexer returned null
         System.out.println(JsonPrinter.print(Parser.parse(lexer.getTokens())));
     }
 }

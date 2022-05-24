@@ -5,7 +5,7 @@ public enum TokenType {
     STR,
     START_LIST,
     START_DICT,
-    END_BRACKET,
+    END_ELEMENT,
     EOL,
     EOF
 }
