@@ -1,7 +1,7 @@
-import Lexer.Lexer;
-import Lexer.Token;
-import Parser.JsonPrinter;
-import Parser.Parser;
+import lexer.Lexer;
+import lexer.Token;
+import parser.JsonPrinter;
+import parser.Parser;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -19,7 +19,6 @@ public class IntegrationTest {
     }
 
     public String parse(List<Token> tokens) {
-        Parser.reset();
         return JsonPrinter.print(Parser.parse(tokens));
     }
 

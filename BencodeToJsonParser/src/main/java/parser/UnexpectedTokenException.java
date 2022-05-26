@@ -1,6 +1,6 @@
-package Parser;
+package parser;
 
-import Lexer.Token;
+import lexer.Token;
 
 public class UnexpectedTokenException extends Exception {
     Token token;

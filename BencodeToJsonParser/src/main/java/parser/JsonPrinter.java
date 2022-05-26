@@ -1,4 +1,4 @@
-package Parser;
+package parser;
 
 public class JsonPrinter {
     static Expr expr;
@@ -8,18 +8,11 @@ public class JsonPrinter {
         JsonPrinter.expr = expr;
     }
 
-    // CR: unused
-    public static void print() {
-        result.delete(0, result.length());
-        printBExpr(expr);
-    }
-
     // CR: use the same pattern as in Lexer
     public static String print(Expr string) {
-        result.delete(0, result.length());
-
         if(string == null) return null;
 
+        JsonPrinter printer = new JsonPrinter(string);
         printBExpr(string);
         return result.toString();
     }

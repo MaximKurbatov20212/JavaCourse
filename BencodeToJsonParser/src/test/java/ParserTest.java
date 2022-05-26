@@ -1,15 +1,15 @@
-import Lexer.Token;
-import Lexer.TokenType;
-import Parser.*;
+import lexer.Token;
+import lexer.TokenType;
+import parser.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import Parser.Expr.*;
+import parser.Expr.*;
 
-import static Lexer.TokenType.*;
+import static lexer.TokenType.*;
 
 public class ParserTest {
 

@@ -1,29 +1,24 @@
-package Parser;
+package parser;
 
-import Lexer.Token;
-import Reporter.ErrorReporter;
+import lexer.Token;
+import reporter.ErrorReporter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static Lexer.TokenType.*;
+import static lexer.TokenType.*;
 
 public class Parser {
     private static List<Token> tokens;
     private static int curPos = 0;
 
     public Parser(List<Token> tokens) {
-        reset();
         Parser.tokens = tokens;
     }
 
     public static Expr parse(List<Token> tokens) {
-        // CR: please reuse same pattern as in Lexer, rn you may get some very unexpected results that is hard to debug
-        // CR: if you'll forget to call reset()
-        reset();
-        Parser.tokens = tokens;
-
+        Parser parser = new Parser(tokens);
         try {
             Expr expr = parseBDict();
             // CR: also you need to check what kind of token you have and print error message if it is invalid
@@ -51,14 +46,8 @@ public class Parser {
                     return parseBDict();
                 }
                 catch (BEntryNotFoundException e) {
-                    // CR: message is unclear, only one error is reported
-                    ErrorReporter.report("Invalid entry format");
                     return null;
                 }
-            }
-            case EOF -> {
-                // CR: it is ok if we are not in recursion, otherwise we should report EOF as unexpected token
-                return null;
             }
             default -> throw new UnexpectedTokenException(token);
         }
@@ -92,8 +81,12 @@ public class Parser {
     }
 
     private static Token consume() {
-        // CR: need to check that we're not out of bounds
-        return tokens.get(curPos++);
+        try {
+            return tokens.get(curPos++);
+        }
+        catch (IndexOutOfBoundsException e) {
+
+        }
     }
 
     private static Token peek() {
@@ -107,16 +100,14 @@ public class Parser {
     private static Expr.BEntry parseBEntry() throws BEntryNotFoundException, UnexpectedTokenException {
         Expr.BString left = parseString();
         // CR: why parse value if key is not found?
+        // If key is not found then throws Exception
         Expr right = parseExpr();
 
-        if(parseBEntryError(left, right)) {
+        if(right == null) {
             throw new BEntryNotFoundException();
         }
-        return new Expr.BEntry(left, right);
-    }
 
-    private static boolean parseBEntryError(Expr left, Expr right) {
-        return left == null || right == null;
+        return new Expr.BEntry(left, right);
     }
 
     private static Expr.BString parseString() throws UnexpectedTokenException {
@@ -128,10 +119,6 @@ public class Parser {
     private static Expr parsePrimary() throws UnexpectedTokenException {
         Token token = consume();
         switch (token.type()) {
-            // CR: don't we have only STR or NUM cases here? based on parsePrimary() only usage
-            case EOL, EOF -> {
-                return null;
-            }
             case STR -> {
                 return new Expr.BString(token.value());
             }
@@ -140,10 +127,5 @@ public class Parser {
             }
             default -> throw new UnexpectedTokenException(token);
         }
-    }
-
-    public static void reset() {
-        curPos = 0;
-        tokens = null;
     }
 }

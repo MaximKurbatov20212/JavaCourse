@@ -1,4 +1,4 @@
-package Reporter;
+package reporter;
 
 public class ErrorReporter {
     private static final int MAX_MESSAGES = 20;

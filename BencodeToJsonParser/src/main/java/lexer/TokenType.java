@@ -1,4 +1,4 @@
-package Lexer;
+package lexer;
 
 public enum TokenType {
     NUM,
@@ -6,6 +6,5 @@ public enum TokenType {
     START_LIST,
     START_DICT,
     END_ELEMENT,
-    EOL,
     EOF
 }

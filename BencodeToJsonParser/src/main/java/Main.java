@@ -1,7 +1,7 @@
-import Lexer.Lexer;
-import Parser.Parser;
+import lexer.Lexer;
+import parser.Parser;
 
-import Parser.JsonPrinter;
+import parser.JsonPrinter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
