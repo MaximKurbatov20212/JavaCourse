@@ -1,65 +1,16 @@
-package Model;
+package model;
 
+import java.util.List;
 
-// enter -> invoke controller from view (as listener) onMenuItem(menuItem)
-enum MenuItem {
-    PLAY,
-    RECORDS,
-    ABOUT
-    // ....
-}
 public class Menu {
-    public static Menu INSTANCE = new Menu();
-
-    public static final int IN_ABOUT_MENU = 3;
-    public static final int IN_HIGH_SCORES_MENU = 2;
-    public static final int IN_MAIN_MENU = 0;
-    public static final int IN_GAME = 1;
-    public static final int IN_REGISTRATION = 4;
-
     private final Cursor cursor = new Cursor();
-    private boolean isVisible = false;
 
-    private int condition;
-
-    public static Menu getInstance() {
-        return INSTANCE;
+    public void cursorUp() {
+        cursor.dec();
     }
 
-    public void setCondition(int condition) {
-        this.condition = condition;
-    }
-
-    public int getCondition() {
-        return condition;
-    }
-
-    public boolean isInAboutMenu() {
-        return condition == IN_ABOUT_MENU;
-    }
-
-    public boolean isInMainMenu() {
-        return condition == IN_MAIN_MENU;
-    }
-
-    public boolean isInHighScoresMenu() {
-        return condition == IN_HIGH_SCORES_MENU;
-    }
-
-    public void setVisible(boolean b) {
-        isVisible = b;
-    }
-
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    public int cursorUp() {
-        return cursor.dec();
-    }
-
-    public int cursorDown() {
-        return cursor.inc();
+    public void cursorDown() {
+        cursor.inc();
     }
 
 
@@ -67,24 +18,26 @@ public class Menu {
         return cursor.getPosition();
     }
 
-    public static class Cursor {
-        private int position;
+    public List<GameObject> getGameObjects() {
+        return List.of(new GameObject(150, 180 + 68 * cursor.position, ObjectType.CURSOR, ""));
+    }
 
+    public static class Cursor {
         public static final int NEW_GAME = 0;
         public static final int ABOUT = 1;
         public static final int HIGH_SCORES = 2;
         public static final int EXIT = 3;
 
-        public int inc() {
-            if(position == 3) return position;
+        int position = NEW_GAME;
+
+        public void inc() {
+            if (position == EXIT) return;
             position++;
-            return position;
         }
 
-        public int dec() {
-            if(position == 0) return position;
+        public void dec() {
+            if(position == NEW_GAME) return;
             position--;
-            return position;
         }
 
         public int getPosition() {

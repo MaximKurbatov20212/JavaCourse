@@ -1,19 +1,21 @@
-package Model;
+package model;
 
-import static Controller.GameStateHandler.gameDelay;
+import static controller.GameStateHandler.gameDelay;
 
 public class Ball {
-    public final static Ball INSTANCE = new Ball();
     public static final int RADIUS = 10;
 
-    private double positionX = 200;
-    private double positionY = 450;
+    private double positionX;
+    private double positionY;
 
     public static final double STEP = 0.25 * gameDelay;
-    // CR: move to block, make const
-    public static final double EPS = STEP;
 
-    private Ball() {}
+    public Ball() {
+        positionX = 200;
+        positionY = 350;
+        dVector.x = 0;
+        dVector.y = 1;
+    }
 
     private final DirectingVector dVector = new DirectingVector();
 
@@ -23,26 +25,10 @@ public class Ball {
         dVector.norm();
     }
 
-
     public void reflect(HitType hitType) {
         switch (hitType) {
             case RIGHT, LEFT -> setDirectingVector(-dVector.x, dVector.y);
             case UP, DOWN -> setDirectingVector(dVector.x, -dVector.y);
-        }
-    }
-
-    public void reflect(Block block) {
-        GameField gameField = GameField.INSTANCE;
-        if (gameField.ballHitsBlockBelow(new GameField.Position(positionX, positionY), block)) {
-            setDirectingVector(dVector.x, -dVector.y);
-        }
-        else if (gameField.ballHitsBlockAbove(new GameField.Position(positionX, positionY), block)) {
-            setDirectingVector(dVector.x, -dVector.y);
-        }
-        else if (gameField.ballHitsBlockRight(new GameField.Position(positionX, positionY), block)) {
-            setDirectingVector(-dVector.x, dVector.y);
-        } else if (gameField.ballHitsBlockLeft(new GameField.Position(positionX, positionY), block)) {
-            setDirectingVector(-dVector.x, dVector.y);
         }
     }
 
@@ -67,7 +53,7 @@ public class Ball {
     }
 
     private boolean hitRightWall() {
-        return positionX + (2 * RADIUS) >= GameField.INSTANCE.getAreaWidth();
+        return positionX + (2 * RADIUS) >= GameField.WIDTH;
     }
 
     private boolean hitCeiling() {
@@ -75,9 +61,9 @@ public class Ball {
     }
 
     public void platformReflect() {
-        Platform platform = Platform.INSTANCE;
+
         double halfWidth = (double) Platform.LEN_OF_PLATFORM / 2;
-        double x = -halfWidth + (getBallCenterX() - platform.getPositionX());
+        double x = -halfWidth + (getBallCenterX() - ArkanoidFrame.gameField.platform.getPositionX());
         double y = Math.sqrt(Math.abs(halfWidth * halfWidth - x * x));
 
         dVector.x = x;
@@ -94,14 +80,6 @@ public class Ball {
         positionY = position.y();
     }
 
-    public double getVectorX() {
-        return dVector.x;
-    }
-
-    public double getVectorY() {
-        return dVector.y;
-    }
-
     private static class DirectingVector {
         private double x;
         private double y = -1.0f;
@@ -110,11 +88,6 @@ public class Ball {
             x = x / Math.sqrt(x*x + y*y);
             y = y / Math.sqrt(x*x + y*y);
         }
-    }
-
-    public void setPosition(double x, double y) {
-        this.positionX = x;
-        this.positionY = y;
     }
 
     public double getPositionX() {

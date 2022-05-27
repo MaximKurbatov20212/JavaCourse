@@ -1,40 +1,16 @@
-package Model;
+package model;
 
-import Controller.GameStateHandler;
-import View.Viewer;
+import controller.GameStateHandler;
+import view.Viewer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
 import java.util.*;
 import java.util.List;
-
-
-/*
-
-View (name was entered):
-    - invoke controller, pass name()
-    - controller has field playerName
-    - validate name from view, if (badName) view.showProblem()
-    - if (!badName) playerName = name
-
-Controller (game ended):
-    if (gameEnd()) {
-        // TODO: singleton
-        RecordManager recordManager = new ...;
-        recordManager.addRecord(model.getResult());
-    }
-
-Controller(show records):
-    - List<Record> records = RecordManager.getInstance().getCurrentRecords();
-    - view.showRecords(records);
- */
 
 public class Registrator {
     private final Container c;
     private final JTextField registrationField = new JTextField(15);
-    private static FileWriter writer;
-
     private static String name;
     private final boolean wasRegistrate = false;
 
@@ -58,27 +34,16 @@ public class Registrator {
         return true;
     }
 
-    public record Note(String name, Integer score){
-        @Override
-        public String toString() {
-            return name + " " + score;
-        }
-    }
-
-    public static List<Note> table = new ArrayList<>();
-
-    public Registrator() throws IOException {
+    public Registrator() {
         c = Viewer.INSTANCE.getContentPane();
         c.setLayout(null);
 
         registrationField.setFont(new Font("Arial", Font.BOLD, 60));
         registrationField.setBackground(Color.black);
         registrationField.setForeground(Color.red);
-        registrationField.setBounds(BackField.WIDTH / 6, (int) (BackField.HEIGHT * 0.75),450,70);
+        registrationField.setBounds(GameField.MAIN_AREA_WIDTH / 6, (int) (GameField.HEIGHT * 0.75),450,70);
         c.add(registrationField);
-        loadScoresTable();
     }
-
 
     public void registrate() {
         if(wasRegistrate) return;
@@ -86,55 +51,17 @@ public class Registrator {
         Viewer.INSTANCE.setVisible(true);
     }
 
-    private void loadScoresTable() throws IOException {
-        FileReader file = new FileReader("src/main/java/Pictures/HighScores.txt");
-        BufferedReader bf = new BufferedReader(file);
-
-        while(true) {
-            String a = bf.readLine();
-            if (a == null) break;
-            String[] b = a.split(" ");
-            table.add(new Note(b[0], Integer.parseInt(b[1])));
-        }
-        file.close();
-    }
-
     private static boolean isFree(String name) {
-        return table.stream().noneMatch(note -> Objects.equals(note.name, name));
-    }
-
-    public static void writeNewRecords() {
-        try {
-            writer = new FileWriter("src/main/java/Pictures/HighScores.txt");
-            writer.write(""); // delete all in the file
-            writer.close();
-
-            writer = new FileWriter("src/main/java/Pictures/HighScores.txt", true);
-            for(Note note : table) {
-                writer.append(note.toString()).append("\n");
-            }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void addToTable(Integer score) {
-        boolean hasNote = false;
-
-        for(int i = 0; i < table.size(); i++) {
-            Note note = table.get(i);
-            if(Objects.equals(note.name, name)) {
-                hasNote = true;
-                if(note.score >= score) break;
-
-                table.remove(i);
-                table.add(new Note(name, score));
-                break;
+        List<RecordManager.Note> notes = RecordManager.INSTANCE.getTable();
+        for (RecordManager.Note note : notes) {
+            if (Objects.equals(note.name(), name)) {
+                return false;
             }
         }
-        if(!hasNote) {
-            table.add(new Note(name, score));
-        }
+        return true;
+    }
+
+    public String getName() {
+        return name;
     }
 }

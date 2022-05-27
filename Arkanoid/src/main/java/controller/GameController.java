@@ -1,16 +1,16 @@
-package Controller;
+package controller;
 
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.HashSet;
 
-import static Controller.GameStateHandler.*;
-import static Controller.GameStateHandler.menuDelay;
+import static controller.GameStateHandler.menuDelay;
+import static model.Condition.IN_GAME;
 
 public class GameController extends KeyAdapter {
     public static final GameController INSTANCE = new GameController();
-
     private final GameStateHandler gameHandler = GameStateHandler.INSTANCE;
+
     private final Timer timer;
     private final HashSet<Integer> pressedKeys = new HashSet<>();
 
@@ -31,7 +31,7 @@ public class GameController extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if(gameHandler.condition == IN_GAME) {
+        if(gameHandler.arkanoidFrame.getCondition() == IN_GAME) {
             pressedKeys.add(e.getKeyCode());
         } else {
              gameHandler.handleAction(e.getKeyCode());

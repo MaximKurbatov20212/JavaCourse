@@ -1,26 +1,20 @@
-package Controller;
+package controller;
 
-import Model.*;
-import Model.Menu;
-import View.Viewer;
+import model.Menu;
+import model.Platform;
+import model.Winner;
+import view.Viewer;
+
+import model.ArkanoidFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
-import static Model.GameField.Winner.NOBODY;
+import static model.Condition.*;
 
 public class GameStateHandler implements ActionListener {
     public static final GameStateHandler INSTANCE = new GameStateHandler();
-
-    // Conditions of Controller.GameStateHandler
-    public static final int IN_REGISTRATION = -1;
-    public static final int IN_GAME = 1;
-    public static final int IN_ABOUT_MENU = 3;
-    public static final int IN_HIGH_SCORES_MENU = 2;
-    public static final int IN_MAIN_MENU = 0;
-    public static final int STOP_THE_WORLD = 4;
 
     // Codes of > < symbols
     private final int RIGHT = 39;
@@ -34,24 +28,12 @@ public class GameStateHandler implements ActionListener {
     public static final double gameDelay = 15;
     public static final double menuDelay = 120;
 
-    public int condition;
+    public ArkanoidFrame arkanoidFrame = new ArkanoidFrame(IN_REGISTRATION);
+
     private Timer timer;
 
-    private final Menu mainMenu = Menu.getInstance();
-    private Registrator registrator;
-
-    private GameStateHandler() {
-        try {
-            registrator = new Registrator();
-        }
-        catch (IOException e) {
-            System.err.println("Pls, don't delete HighScores.txt");
-        }
-        condition = IN_REGISTRATION;
-    }
-
     public void handleAction(int keyCode) {
-        switch(condition) {
+        switch(arkanoidFrame.getCondition()) {
             case IN_REGISTRATION : {
                 registrate();
             }
@@ -63,24 +45,24 @@ public class GameStateHandler implements ActionListener {
                 }
                 break;
             }
-            case(IN_ABOUT_MENU):
-            case(IN_HIGH_SCORES_MENU): {
+            case IN_ABOUT_MENU:
+            case IN_HIGH_SCORES: {
                 if(keyCode == ESC) goToMainMenu();
             }
 
-            case(IN_GAME): {
+            case IN_GAME: {
                 switch(keyCode) {
                     case ESC -> goToMainMenu();
                     case EXIT -> exitGame();
-                    case RIGHT -> Platform.INSTANCE.move(RIGHT);
-                    case LEFT -> Platform.INSTANCE.move(LEFT);
+                    case RIGHT -> ArkanoidFrame.gameField.platform.move(Platform.Direction.RIGHT);
+                    case LEFT -> ArkanoidFrame.gameField.platform.move(Platform.Direction.LEFT);
                 }
                 break;
             }
-            case(STOP_THE_WORLD): {
+            case END_GAME: {
                 if((keyCode == ESC || keyCode == ENTER)) {
-                    GameField.INSTANCE.setWinner(GameField.Winner.NOBODY);
-                    Registrator.addToTable(GameField.INSTANCE.getScore());
+                    ArkanoidFrame.gameField.setWinner(Winner.NOBODY);
+                    ArkanoidFrame.recordManager.addToTable(arkanoidFrame.registrator.getName(), ArkanoidFrame.gameField.getScore());
                     goToMainMenu();
                 }
             }
@@ -88,7 +70,7 @@ public class GameStateHandler implements ActionListener {
     }
 
     private void checkCursorPosition() {
-        int cursorPosition = Menu.getInstance().getCursorPosition();
+        int cursorPosition = ArkanoidFrame.menu.getCursorPosition();
         switch (cursorPosition) {
             case Menu.Cursor.NEW_GAME -> startGame();
             case Menu.Cursor.HIGH_SCORES -> goToHighScoresMenu();
@@ -98,80 +80,64 @@ public class GameStateHandler implements ActionListener {
     }
 
     private void exitGame() {
-        Registrator.writeNewRecords();
         System.exit(0);
     }
 
     private void cursorUp() {
-        mainMenu.cursorUp();
+        ArkanoidFrame.menu.cursorUp();
+        ArkanoidFrame.update();
     }
 
     private void cursorDown() {
-        mainMenu.cursorDown();
+        ArkanoidFrame.menu.cursorDown();
+        ArkanoidFrame.update();
     }
 
     public void initGame() {
         timer = new Timer((int) gameDelay, this);
         timer.start();
+        ArkanoidFrame.condition = IN_MAIN_MENU;
 
         Viewer.INSTANCE.addKeyListener(GameController.INSTANCE);
         Viewer.INSTANCE.requestFocus();
 
-        condition = IN_MAIN_MENU;
-        mainMenu.setCondition(Menu.IN_MAIN_MENU);
+        ArkanoidFrame.update();
     }
 
     public void registrate() {
-        condition = IN_REGISTRATION;
-        mainMenu.setCondition(Menu.IN_REGISTRATION);
-        mainMenu.setVisible(true);
-        registrator.registrate();
+        ArkanoidFrame.update();
+        arkanoidFrame.registrator.registrate();
     }
 
     public void startGame() {
         GameController.INSTANCE.setDelay(gameDelay);
-        condition = IN_GAME;
-        setStartPositions();
-        Viewer.INSTANCE.repaint();
-    }
-
-    private void setStartPositions() {
-        Ball.INSTANCE.setPosition(250, 300);
-        Ball.INSTANCE.setDirectingVector(0,-1);
-        Platform.INSTANCE.setPosition(210);
-        GameField.INSTANCE.setScore(0);
-
-        mainMenu.setCondition(Menu.IN_GAME);
-        mainMenu.setVisible(false);
-
-        GameField.INSTANCE.setWinner(NOBODY);
-        GameField.INSTANCE.fillField();
+        arkanoidFrame = new ArkanoidFrame(IN_GAME);
+        ArkanoidFrame.update();
     }
 
     public void goToAboutMenu() {
-        condition = IN_ABOUT_MENU;
-        mainMenu.setCondition(Menu.IN_ABOUT_MENU);
+        ArkanoidFrame.condition = IN_ABOUT_MENU;
+        ArkanoidFrame.update();
     }
 
     public void goToMainMenu() {
         GameController.INSTANCE.setDelay(menuDelay);
-        condition = IN_MAIN_MENU;
-        mainMenu.setCondition(Menu.IN_MAIN_MENU);
-        mainMenu.setVisible(true);
+        ArkanoidFrame.condition = IN_MAIN_MENU;
+        ArkanoidFrame.update();
     }
 
     public void goToHighScoresMenu() {
-        condition = IN_HIGH_SCORES_MENU;
-        mainMenu.setCondition(Menu.IN_HIGH_SCORES_MENU);
+        ArkanoidFrame.condition = IN_HIGH_SCORES;
+        ArkanoidFrame.update();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(condition == IN_REGISTRATION) {
-            registrator.tryRegistrate();
+        if(ArkanoidFrame.condition == IN_REGISTRATION) {
+            arkanoidFrame.registrator.tryRegistrate();
         }
-        else if(condition == IN_GAME) {
-            GameField.INSTANCE.makeMove();
+        else if(ArkanoidFrame.condition == IN_GAME) {
+            ArkanoidFrame.gameField.makeMove();
         }
         Viewer.INSTANCE.repaint();
     }

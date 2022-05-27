@@ -1,2 +1,8 @@
-package model;public enum Winner {
+package model;
+
+public enum Winner {
+    PLAYER,
+    COMPUTER,
+    NOBODY
 }
+

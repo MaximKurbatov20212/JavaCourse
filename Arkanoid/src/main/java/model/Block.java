@@ -1,54 +1,29 @@
-package Model;
-
+package model;
 
 public class Block {
     public static final int HEIGHT = 20;
     public static final int WIDTH = 80;
-    private final int positionX;
-    private final int positionY;
+    public static final double EPS = 5;
 
-    private int numberOfLives;
+    private final GameField.Position position;
 
-    // CR: remove
-    public Block(int x, int y) {
-        positionX = x;
-        positionY = y;
-
-        switch ((int) (Math.random() * 3)) {
-            case 0 -> numberOfLives = 3;
-            case 1 -> numberOfLives = 2;
-            case 2 -> numberOfLives = 1;
-        }
-    }
+    public int numberOfLives;
 
     public Block(int x, int y, int lives) {
-        positionX = x;
-        positionY = y;
+        position = new GameField.Position(x, y);
         this.numberOfLives = lives;
     }
 
-//    HitType hit(double x, double y) {
-//        return HitType.LEFT;
-//    }
-
-    public int getPositionX() {
-        return positionX;
-    }
-
-    public int getPositionY() {
-        return positionY;
+    public GameField.Position getPosition() {
+        return position;
     }
 
     public boolean isAlive() {
         return numberOfLives > 0;
     }
 
-    public void decreaseLives() {
+    public boolean decreaseLives() {
         numberOfLives--;
-    }
-
-    // CR: remove
-    public int getLives() {
-        return numberOfLives;
+        return isAlive();
     }
 }
