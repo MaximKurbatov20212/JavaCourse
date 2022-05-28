@@ -99,13 +99,13 @@ public class GameField {
             list.add(new GameObject((int) block.getPosition().x, (int) block.getPosition().y, ObjectType.BLOCK, String.valueOf(block.numberOfLives)));
         }
 
-//        if(winner == Winner.COMPUTER) {
-//            list.add(new GameObject(400, 300, ObjectType.YOU_LOSE, ""));
-//        }
-//
-//        if(winner == Winner.PLAYER) {
-//            list.add(new GameObject(400, 300, ObjectType.YOU_WIN, ""));
-//        }
+        if(winner == Winner.COMPUTER) {
+            list.add(new GameObject(400, 300, ObjectType.YOU_LOSE, ""));
+        }
+
+        if(winner == Winner.PLAYER) {
+            list.add(new GameObject(400, 300, ObjectType.YOU_WIN, ""));
+        }
         return list;
     }
 

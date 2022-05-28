@@ -128,8 +128,8 @@ public class GameStateHandler implements ActionListener {
         ArkanoidFrame.update();
     }
 
-    private GameField gameField;
-    private GamePanel gamePanel;
+//    private GameField gameField;
+//    private GamePanel gamePanel;
     @Override
     public void actionPerformed(ActionEvent e) {
         if(ArkanoidFrame.condition == IN_REGISTRATION) {
@@ -137,12 +137,13 @@ public class GameStateHandler implements ActionListener {
         }
         else if(ArkanoidFrame.condition == IN_GAME) {
             // CR: move to game controller
+            ArkanoidFrame.gameField.makeMove();
             GameField gameField = ArkanoidFrame.gameField;
-            boolean hasEnded = gameField.makeMove();
-            if (hasEnded) {
-                gamePanel.showWinner(gameField.playerWon());
-            }
-
+//            boolean hasEnded = gameField.makeMove();
+//            if (hasEnded) {
+//                gamePanel.showWinner(gameField.playerWon());
+//            }
+//
         }
         Viewer.INSTANCE.repaint();
     }
