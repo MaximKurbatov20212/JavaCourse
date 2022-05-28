@@ -21,8 +21,13 @@ public class Parser {
         Parser parser = new Parser(tokens);
         try {
             Expr expr = parseBDict();
-            // CR: also you need to check what kind of token you have and print error message if it is invalid
-            return curPos == tokens.size() - 1 ? expr : null;
+
+            if(hasRedundantTokens()) {
+                showError();
+                return null;
+            }
+
+            return expr;
         }
         // CR: both exceptions should be checked or unchecked
         catch (UnexpectedTokenException e) {
@@ -30,6 +35,14 @@ public class Parser {
             ErrorReporter.report("Unexpected token: " + e);
             return null;
         }
+    }
+
+    private static void showError() {
+        ErrorReporter.report("Redundunt tokens at the end.\n" + tokens.toString());
+    }
+
+    private static boolean hasRedundantTokens() {
+        return curPos != tokens.size() - 1;
     }
 
     private static Expr parseExpr() throws UnexpectedTokenException {
