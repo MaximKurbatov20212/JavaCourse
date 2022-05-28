@@ -75,11 +75,6 @@ public class Ball {
         return positionX + RADIUS;
     }
 
-    public void setPosition(GameField.Position position) {
-        positionX = position.x();
-        positionY = position.y();
-    }
-
     private static class DirectingVector {
         private double x;
         private double y = -1.0f;

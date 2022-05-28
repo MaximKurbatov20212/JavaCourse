@@ -1,11 +1,7 @@
 package controller;
 
-import model.Menu;
-import model.Platform;
-import model.Winner;
+import model.*;
 import view.Viewer;
-
-import model.ArkanoidFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -34,6 +30,7 @@ public class GameStateHandler implements ActionListener {
 
     public void handleAction(int keyCode) {
         switch(arkanoidFrame.getCondition()) {
+            // CR: move to view
             case IN_REGISTRATION : {
                 registrate();
             }
@@ -131,13 +128,21 @@ public class GameStateHandler implements ActionListener {
         ArkanoidFrame.update();
     }
 
+    private GameField gameField;
+    private GamePanel gamePanel;
     @Override
     public void actionPerformed(ActionEvent e) {
         if(ArkanoidFrame.condition == IN_REGISTRATION) {
             arkanoidFrame.registrator.tryRegistrate();
         }
         else if(ArkanoidFrame.condition == IN_GAME) {
-            ArkanoidFrame.gameField.makeMove();
+            // CR: move to game controller
+            GameField gameField = ArkanoidFrame.gameField;
+            boolean hasEnded = gameField.makeMove();
+            if (hasEnded) {
+                gamePanel.showWinner(gameField.playerWon());
+            }
+
         }
         Viewer.INSTANCE.repaint();
     }

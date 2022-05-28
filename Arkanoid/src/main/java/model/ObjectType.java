@@ -5,8 +5,4 @@ public enum ObjectType {
     PLATFORM,
     BLOCK,
     ROUND,
-    SCORE,
-    CURSOR,
-    YOU_WIN,
-    YOU_LOSE
 }

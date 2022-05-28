@@ -15,6 +15,7 @@ public class GameController extends KeyAdapter {
     private final HashSet<Integer> pressedKeys = new HashSet<>();
 
     private GameController() {
+        // CR: merge timer & game handler
         timer = new Timer((int) menuDelay, action -> {
             if(!pressedKeys.isEmpty()){
                 for (Integer pressedKey : pressedKeys) {

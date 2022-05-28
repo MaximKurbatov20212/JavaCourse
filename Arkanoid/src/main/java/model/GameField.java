@@ -50,8 +50,8 @@ public class GameField {
         return winner != Winner.NOBODY;
     }
 
-    public void makeMove() {
-        if (gameEnded()) return;
+    public boolean makeMove() {
+        if (gameEnded()) return true;
 
         Position position = ball.move();
         Hit hit = getHit(position);
@@ -66,46 +66,46 @@ public class GameField {
             if (isAllBlocksDied()) {
                 winner = Winner.PLAYER;
                 ArkanoidFrame.condition = Condition.END_GAME;
-                ArkanoidFrame.update();
-                return;
+//                ArkanoidFrame.update();
+                return true;
             }
             ball.reflect(hit.hitType);
-            return;
+            return false;
         }
 
         if (wallCollision(position)) {
             ball.reflect();
-            return;
+            return false;
         }
         if (platformCollision(position)) {
             ball.platformReflect();
-            return;
+            return false;
         }
         if (outOfBounds(position)) {
             winner = Winner.COMPUTER;
-            ArkanoidFrame.condition = Condition.END_GAME;
+            return true;
+//            ArkanoidFrame.condition = Condition.END_GAME;
         }
-        ArkanoidFrame.update();
+        return false;
     }
 
     public List<GameObject> getGameObjects() {
         ArrayList<GameObject> list = new ArrayList<>();
+        // CR: make int
         list.add(new GameObject((int) ball.getPositionX(), (int) ball.getPositionY(), ObjectType.BALL, ""));
         list.add(new GameObject(platform.getPositionX(), platform.getPositionY(), ObjectType.PLATFORM, ""));
-        list.add(new GameObject(580, 520, ObjectType.ROUND, String.valueOf(round)));
-        list.add(new GameObject(570, 280, ObjectType.SCORE, String.valueOf(score)));
 
         for(Block block : blocks) {
             list.add(new GameObject((int) block.getPosition().x, (int) block.getPosition().y, ObjectType.BLOCK, String.valueOf(block.numberOfLives)));
         }
 
-        if(winner == Winner.COMPUTER) {
-            list.add(new GameObject(400, 300, ObjectType.YOU_LOSE, ""));
-        }
-
-        if(winner == Winner.PLAYER) {
-            list.add(new GameObject(400, 300, ObjectType.YOU_WIN, ""));
-        }
+//        if(winner == Winner.COMPUTER) {
+//            list.add(new GameObject(400, 300, ObjectType.YOU_LOSE, ""));
+//        }
+//
+//        if(winner == Winner.PLAYER) {
+//            list.add(new GameObject(400, 300, ObjectType.YOU_WIN, ""));
+//        }
         return list;
     }
 

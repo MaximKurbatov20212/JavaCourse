@@ -1,7 +1,11 @@
 package model;
 
+import javax.swing.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
+// CR: move to MenuPanel
 public class Menu {
     private final Cursor cursor = new Cursor();
 
@@ -45,3 +49,52 @@ public class Menu {
         }
     }
 }
+//
+//interface MenuListener {
+//    void optionSelected(Menu.MenuOption option);
+//}
+//
+//class MenuPanel extends JPanel {
+//
+//    MenuPanel(MenuListener listener) {
+//        this.addKeyListener(new KeyAdapter() {
+//            @Override
+//            public void keyTyped(KeyEvent e) {
+//                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+//                    listener.optionSelected(menuOption);
+//                    return;
+//                }
+//                if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+//                    select(true);
+//                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
+//                    select(false);
+//                }
+//            }
+//
+//            @Override
+//            public void keyPressed(KeyEvent e) {
+//                super.keyPressed(e);
+//            }
+//
+//            @Override
+//            public void keyReleased(KeyEvent e) {
+//                super.keyReleased(e);
+//            }
+//        });
+//
+//    }
+//
+//
+//    public enum MenuOption {
+//        HIGH_SCORES,
+//        ABOUT;
+//    }
+//
+//    private MenuOption menuOption = MenuOption.ABOUT;
+//
+//    void select(boolean isNext) {
+//        int next = isNext ? 1 : -1;
+//        MenuOption[] values = MenuOption.values();
+//        menuOption = values[(menuOption.ordinal() + next) % values.length];
+//    }
+//}
