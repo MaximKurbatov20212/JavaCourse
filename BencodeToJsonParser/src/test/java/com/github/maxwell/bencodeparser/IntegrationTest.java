@@ -1,7 +1,10 @@
-import lexer.Lexer;
-import lexer.Token;
-import parser.JsonPrinter;
-import parser.Parser;
+package com.github.maxwell.bencodeparser;
+
+import com.github.maxwell.bencodeparser.lexer.Lexer;
+import com.github.maxwell.bencodeparser.lexer.Token;
+import com.github.maxwell.bencodeparser.parser.Expr;
+import com.github.maxwell.bencodeparser.parser.JsonPrinter;
+import com.github.maxwell.bencodeparser.parser.Parser;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -10,6 +13,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class IntegrationTest {
 
@@ -19,15 +23,31 @@ public class IntegrationTest {
     }
 
     public String parse(List<Token> tokens) {
-        return JsonPrinter.print(Parser.parse(tokens));
+        if(tokens == null) return null;
+        Expr expr = Parser.parse(tokens);
+        return expr == null ? null : JsonPrinter.print(expr);
     }
-
 
     @Test
     public void emptyDictionary() throws IOException {
         String str = "d e"; // ok
         String rightAnswer = "{\n\n}";
-        assertEquals(rightAnswer, parse((scan(str))));
+        String answer = parse((scan(str)));
+        assertEquals(rightAnswer, answer);
+    }
+
+    @Test
+    public void extraTokensAfterResult() throws IOException {
+        String str = "d 5:large i10e e e e"; // ok
+        String answer = parse((scan(str)));
+        assertNull(answer);
+    }
+
+    @Test
+    public void tooLargeNumber() throws IOException {
+        String str = "d 5:large i10000000000000000000000000e e"; // ok
+        String answer = parse((scan(str)));
+        assertNull(answer);
     }
 
     @Test

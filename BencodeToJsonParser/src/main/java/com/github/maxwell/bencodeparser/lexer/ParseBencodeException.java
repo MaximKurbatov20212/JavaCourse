@@ -1,6 +1,5 @@
-package lexer;
+package com.github.maxwell.bencodeparser.lexer;
 
-// CR: very generic exception type, better rename to smth more specific
 public class ParseBencodeException extends RuntimeException {
     private final String msg;
     private final int pos;

@@ -1,8 +1,11 @@
-import lexer.*;
+package com.github.maxwell.bencodeparser;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.github.maxwell.bencodeparser.lexer.Lexer;
+import com.github.maxwell.bencodeparser.lexer.Token;
+import com.github.maxwell.bencodeparser.lexer.TokenType;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +20,7 @@ public class LexerTest {
     private static List<TokenType> scan(String expressions) throws IOException {
         BufferedReader br = new BufferedReader(new StringReader(expressions));
         List<Token> tokens = Lexer.scan(br);
-        return tokens == null ? null : tokens.stream().map(t -> t.type()).toList();
+        return tokens == null ? null : tokens.stream().map(Token::type).toList();
     }
 
     private static void assertTypes(List<TokenType> types, TokenType... expected) {
@@ -27,6 +30,11 @@ public class LexerTest {
     @Test
     public void empty() throws IOException {
         assertTypes(scan(""), TokenType.EOF);
+    }
+
+    @Test
+    public void tooLargeNumber() throws IOException {
+        assertNull(scan("i1000000000000000000000000e"));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package lexer;
+package com.github.maxwell.bencodeparser.lexer;
 
 public enum TokenType {
     NUM,

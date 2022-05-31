@@ -1,4 +1,4 @@
-package reporter;
+package com.github.maxwell.bencodeparser.reporter;
 
 public class ErrorReporter {
     private static final int MAX_MESSAGES = 20;

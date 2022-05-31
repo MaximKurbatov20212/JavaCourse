@@ -1,17 +1,18 @@
-package lexer;
+package com.github.maxwell.bencodeparser.lexer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import reporter.ErrorReporter;
+import com.github.maxwell.bencodeparser.reporter.ErrorReporter;
 
 import static java.lang.Character.isWhitespace;
 
 public class Lexer {
     private final List<Token> tokens = new ArrayList<>();
     private int curPos;
+    private int numberOfLine;
     private boolean hasErrors = false;
 
     private final BufferedReader br;
@@ -24,6 +25,7 @@ public class Lexer {
         String line;
 
         while ((line = br.readLine()) != null) {
+            numberOfLine++;
             if(scan(line) == null) return null;
         }
 
@@ -41,12 +43,20 @@ public class Lexer {
             while (curPos < line.length()) {
                 char c = line.charAt(curPos);
 
-                // string
-                if (isDigit(c)) {
-                    tokens.add(getString(line));
+                if(isWhitespace(c)) {
+                    curPos++;
                     continue;
                 }
-                if(isWhitespace(c)) curPos++;
+
+                if (isDigit(c)) {
+                    Token string = getString(line);
+                    if(string == null)  {
+                        hasErrors = true;
+                        continue;
+                    }
+                    tokens.add(string);
+                    continue;
+                }
 
                 switch (c) {
 
@@ -54,7 +64,16 @@ public class Lexer {
 
                     case 'l' -> addToken(new Token(TokenType.START_LIST, ""));
 
-                    case 'i' -> addToken(new Token(TokenType.NUM, String.valueOf(getNumber(line, 'e'))));
+                    case 'i' -> {
+                        curPos++; // skip 'i'
+                        int number = getNumber(line, 'e');
+                        if(number == -1) {
+                            hasErrors = true;
+                            curPos++;
+                            continue;
+                        }
+                        addToken(new Token(TokenType.NUM, String.valueOf(number)));
+                    }
 
                     case 'e' -> addToken(new Token(TokenType.END_ELEMENT, ""));
 
@@ -82,6 +101,9 @@ public class Lexer {
 
     private Token getString(String line) {
         int len = getNumber(line, ':');
+        curPos++; // skip ':'
+
+        if(len == -1) return null;
 
         if(curPos + len > line.length()) throw new ParseBencodeException(line, line.charAt(curPos - 1), curPos - 1);
 
@@ -102,17 +124,17 @@ public class Lexer {
     private int getNumber(String line, char stopChar) {
         char c;
         int start = curPos;
+
         while ((c = line.charAt(curPos)) != stopChar) {
-            if (!isDigit(c)) {
-                throw new ParseBencodeException(line, c, curPos);
-            }
+            if (!isDigit(c)) throw new ParseBencodeException(line, c, curPos);
             curPos++;
         }
+
         try {
-            return Integer.parseInt(line.substring(start, curPos++));
+            return Integer.parseInt(line.substring(start, curPos));
         }
         catch (NumberFormatException e) {
-            ErrorReporter.report("...");
+            ErrorReporter.report(line + "\n" + " ".repeat(start) + "^--- Too large number here");
         }
         return -1;
     }
@@ -127,9 +149,9 @@ public class Lexer {
 
     private String invalidFormat(String line, int pos, char c) {
         return """
-                Unexpected symbol '%c':
+                line %d: unexpected symbol '%c':
                 %s
                 %s^--- here
-                """.formatted(c, line, " ".repeat(pos));
+                """.formatted(numberOfLine, c, line, " ".repeat(pos));
     }
 }

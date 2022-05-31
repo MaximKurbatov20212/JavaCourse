@@ -1,4 +1,4 @@
-package parser;
+package com.github.maxwell.bencodeparser.parser;
 
 import java.util.List;
 

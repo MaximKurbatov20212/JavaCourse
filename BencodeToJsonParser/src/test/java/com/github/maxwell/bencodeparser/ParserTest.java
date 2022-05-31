@@ -1,15 +1,19 @@
-import lexer.Token;
-import lexer.TokenType;
-import parser.*;
+package com.github.maxwell.bencodeparser;
+
+import com.github.maxwell.bencodeparser.lexer.Token;
+import com.github.maxwell.bencodeparser.lexer.TokenType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import parser.Expr.*;
 
-import static lexer.TokenType.*;
+import com.github.maxwell.bencodeparser.parser.Expr;
+import com.github.maxwell.bencodeparser.parser.Expr.*;
+import com.github.maxwell.bencodeparser.parser.Parser;
+
+import static com.github.maxwell.bencodeparser.lexer.TokenType.*;
 
 public class ParserTest {
 
