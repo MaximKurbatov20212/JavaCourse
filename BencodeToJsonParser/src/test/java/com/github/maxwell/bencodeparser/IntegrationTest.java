@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class IntegrationTest {
 
-    private static List<Token> scan(String expressions) throws IOException {
+    private static List<Token> scan(String expressions) {
         BufferedReader br = new BufferedReader(new StringReader(expressions));
         return Lexer.scan(br);
     }
@@ -29,7 +29,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void emptyDictionary() throws IOException {
+    public void emptyDictionary() {
         String str = "d e"; // ok
         String rightAnswer = "{\n\n}";
         String answer = parse((scan(str)));
@@ -37,21 +37,21 @@ public class IntegrationTest {
     }
 
     @Test
-    public void extraTokensAfterResult() throws IOException {
+    public void extraTokensAfterResult() {
         String str = "d 5:large i10e e e e"; // ok
         String answer = parse((scan(str)));
         assertNull(answer);
     }
 
     @Test
-    public void tooLargeNumber() throws IOException {
+    public void tooLargeNumber() {
         String str = "d 5:large i10000000000000000000000000e e"; // ok
         String answer = parse((scan(str)));
         assertNull(answer);
     }
 
     @Test
-    public void emptyList() throws IOException {
+    public void emptyList() {
         String str = "d 9:emptyList l e e"; // ok
         String rightAnswer = """
         {
@@ -62,7 +62,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void test() throws IOException {
+    public void test() {
         String str = "d 1:a i1e e"; // ok
         String rightAnswer = """
         {
@@ -72,7 +72,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void innerList() throws IOException {
+    public void innerList() {
         String str = "d 5:list1 l 5:list2 l i2e e e e"; // ok
         String rightAnswer = """
         {
@@ -87,7 +87,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void innerDictionary() throws IOException {
+    public void innerDictionary() {
         String str = "d 1:a d 1:b d 1:d d 1:a i1e e e e e"; // ok
         String rightAnswer = """
         {
@@ -104,7 +104,7 @@ public class IntegrationTest {
 
 
     @Test
-    public void skipSpaces() throws IOException {
+    public void skipSpaces() {
         String str = "d                                              10:spaces....                                 10:spaces....                   e"; // ok
         String rightAnswer = """
         {
@@ -114,7 +114,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void changeCollocation() throws IOException {
+    public void changeCollocation() {
         String str = "d 1:b i1e 1:a i2e e"; // ok
         String rightAnswer = """
         {

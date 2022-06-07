@@ -30,7 +30,7 @@ public class ParserTest {
     }
 
     @Test
-    public void Dict() {
+    public void dict() {
         Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(STR, "maxwell"), new TokenInfo(END_ELEMENT, "")));
         List<BEntry> list = new ArrayList<>();
         list.add(new BEntry(new BString("hello"), new BString("maxwell")));
@@ -38,7 +38,7 @@ public class ParserTest {
     }
 
     @Test
-    public void List() {
+    public void list() {
         Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(START_LIST, "{"), new TokenInfo(STR, "maxwell"),  new TokenInfo(END_ELEMENT, ""), new TokenInfo(END_ELEMENT, "")));
 
         List<BEntry> listEntries = new ArrayList<>();
@@ -72,7 +72,7 @@ public class ParserTest {
     }
 
     @Test
-    public void InvalidBEntryFormat() {
+    public void invalidBEntryFormat() {
         // Unexpected token Token[type=NUM, value=1234]
         Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(NUM, "1234"), new TokenInfo(STR, "hello"),new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
@@ -123,15 +123,5 @@ public class ParserTest {
         return Parser.parse(tokens);
     }
 
-    private record TokenInfo(TokenType type, Object value) {
-        private Expr expr() {
-            return switch (type) {
-                case NUM -> new Expr.BNumber((Integer) value);
-                case STR -> new Expr.BString((String) value);
-                case START_DICT -> new Expr.BDict((List<Expr.BEntry>) value);
-                case START_LIST -> new Expr.BList((List<Expr>) value);
-                default -> throw new UnsupportedOperationException();
-            };
-        }
-    }
+    private record TokenInfo(TokenType type, Object value) {}
 }

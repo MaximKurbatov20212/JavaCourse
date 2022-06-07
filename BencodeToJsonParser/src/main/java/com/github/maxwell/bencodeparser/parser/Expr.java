@@ -3,6 +3,8 @@ package com.github.maxwell.bencodeparser.parser;
 import java.util.List;
 
 sealed public interface Expr {
+    // CR: all this toString(int) logic should be moved from the Expr class
+    // CR: the reason is that now you won't be able to add another Printer easily, your logic is tide up with JsonPrinter
     String toString(int shifts);
     int shift = 4;
 

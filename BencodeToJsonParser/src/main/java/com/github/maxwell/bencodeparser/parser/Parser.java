@@ -19,33 +19,40 @@ public class Parser {
 
     public static Expr parse(List<Token> tokens) {
         Parser parser = new Parser(tokens);
+        return parser.parse();
+    }
+
+    private Expr parse() {
         try {
-            Expr expr = parser.parseBDict();
-            if(hasExtraTokens(parser, tokens)) {
-                ErrorReporter.report("Unexpected tokens at the end: " + extraTokens(parser, tokens));
+            Expr expr = parseBDict();
+            if(hasExtraTokens()) {
+                ErrorReporter.report("Unexpected tokens at the end: " + extraTokens());
                 return null;
             }
-            return parser.curPos == tokens.size() - 1 ? expr : null;
+            return curPos == tokens.size() - 1 ? expr : null;
         }
         catch (UnexpectedTokenException e) {
-            ErrorReporter.report("Unexpected token: " + parser.unexpectedToken(e));
+            ErrorReporter.report("Unexpected token: " + unexpectedToken(e));
             return null;
         }
     }
 
-    private static String extraTokens(Parser parser, List<Token> tokens) {
+    private String extraTokens() {
+        // CR: use Stream instead
         StringBuilder extraTokens = new StringBuilder();
-        for(int i = parser.curPos; i < tokens.size(); i++) {
+        for(int i = curPos; i < tokens.size(); i++) {
             extraTokens.append(tokens.get(i).type().toString()).append(i == tokens.size() - 1 ? "" : ", ");
         }
         return extraTokens.toString();
     }
 
-    private static boolean hasExtraTokens(Parser parser, List<Token> tokens) {
-        return parser.curPos !=  tokens.size() - 1;
+    private boolean hasExtraTokens() {
+        return curPos !=  tokens.size() - 1;
     }
 
     String unexpectedToken(UnexpectedTokenException e) {
+        // CR: it's better to pass token position in token and make reports like
+        // CR: 'line 1, position 3: expected EOF, got STR'
         return tokens.toString() + e.getToken().toString() + "\n" + " ".repeat(tokens.toString().length() +
                "Unexpected token: ".length()) + "^" + "_".repeat(e.toString().length() - 2) + "^" + " here\n"
                 + "Expected: " + e.getExpectation() + ", got: " + e.getToken().type().toString() + "\n";
@@ -72,7 +79,7 @@ public class Parser {
         }
     }
 
-    private Expr parseBDict() throws BEntryNotFoundException, UnexpectedTokenException {
+    private Expr parseBDict() {
         Token token = consume();
         if(token.type() != START_DICT) throw new UnexpectedTokenException(token, "START_DICT");
         List<Expr.BEntry> entries = new ArrayList<>();
@@ -81,13 +88,15 @@ public class Parser {
             entries.add(parseBEntry());
         }
 
+        // CR: you should not sort entries by yourself, you should check if they are in lexicographical order
+        // CR: if not - report error
         entries.sort(Comparator.comparing(o -> o.left().value()));
 
         consume();
         return new Expr.BDict(entries);
     }
 
-    private Expr parseBList() throws UnexpectedTokenException {
+    private Expr parseBList() {
         Token token = consume();
         if(token.type() != START_LIST) throw new UnexpectedTokenException(token, "START_LIST");
         List<Expr> expressions = new ArrayList<>();
@@ -99,30 +108,30 @@ public class Parser {
         return new Expr.BList(expressions);
     }
 
-    private Token consume() throws UnexpectedTokenException {
+    private Token consume() {
         if(curPos == tokens.size()) {
             throw new UnexpectedTokenException(tokens.get(curPos - 1), "END_ELEMENT");
         }
         return tokens.get(curPos++);
     }
 
-    private Token peek() throws UnexpectedTokenException {
+    private Token peek() {
         if(curPos == tokens.size()) {
             throw new UnexpectedTokenException(tokens.get(curPos - 1), "END_ELEMENT");
         }
         return tokens.get(curPos);
     }
 
-    private boolean isEndToken() throws UnexpectedTokenException {
+    private boolean isEndToken() {
         return peek().type() == END_ELEMENT;
     }
 
-    private Expr.BEntry parseBEntry() throws BEntryNotFoundException, UnexpectedTokenException {
+    // CR: probably can inline when 'if' will be removed
+    private Expr.BEntry parseBEntry() {
         Expr.BString left = parseString();
-        // CR: why parse value if key is not found?
-        // If key is not found then throws Exception
         Expr right = parseExpr();
 
+        // CR: seems that we never enter then branch
         if(right == null) {
             throw new BEntryNotFoundException();
         }
@@ -130,22 +139,18 @@ public class Parser {
         return new Expr.BEntry(left, right);
     }
 
-    private Expr.BString parseString() throws UnexpectedTokenException {
+    private Expr.BString parseString() {
         Token token = consume();
         if (token.type() != STR) throw new UnexpectedTokenException(token, "STR");
         return new Expr.BString(token.value());
     }
 
-    private Expr parsePrimary() throws UnexpectedTokenException {
+    private Expr parsePrimary() {
         Token token = consume();
-        switch (token.type()) {
-            case STR -> {
-                return new Expr.BString(token.value());
-            }
-            case NUM -> {
-                return new Expr.BNumber(Integer.parseInt(token.value()));
-            }
+        return switch (token.type()) {
+            case STR -> new Expr.BString(token.value());
+            case NUM -> new Expr.BNumber(Integer.parseInt(token.value()));
             default -> throw new UnexpectedTokenException(token, "STR or NUM");
-        }
+        };
     }
 }

@@ -8,6 +8,7 @@ public class ErrorReporter {
         nMessages++;
         System.err.println(message);
         if (nMessages >= MAX_MESSAGES) {
+            // CR: you don't stop printing actually
             System.err.println("Too many errors, stopped...");
         }
     }
