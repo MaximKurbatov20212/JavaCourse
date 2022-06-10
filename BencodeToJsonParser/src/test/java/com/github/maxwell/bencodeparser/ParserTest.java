@@ -73,19 +73,15 @@ public class ParserTest {
 
     @Test
     public void invalidBEntryFormat() {
-        // Unexpected token Token[type=NUM, value=1234]
         Expr expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(NUM, "1234"), new TokenInfo(STR, "hello"),new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
 
-        // Unexpected token Token[type=END_BRACKET, value=]
         expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(STR, "hello"), new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
 
-        // Unexpected token Token[type=START_LIST, value=]
         expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(START_LIST, ""), new TokenInfo(END_ELEMENT, ""), new TokenInfo(STR, "hello"), new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
 
-        // Unexpected token Token[type=START_DICT, value=]
         expr = parse(tokens(new TokenInfo(START_DICT, "{"), new TokenInfo(START_DICT, ""), new TokenInfo(END_ELEMENT, ""), new TokenInfo(STR, "hello"), new TokenInfo(END_ELEMENT, "")));
         Assertions.assertNull(expr);
     }
@@ -110,12 +106,13 @@ public class ParserTest {
 
         private static List<Token> tokens(TokenInfo... tokenInfos) {
         List<Token> tokens = new ArrayList<>();
+        int i = 0;
 
         for (TokenInfo tokenInfo : tokenInfos) {
-            tokens.add(new Token(tokenInfo.type, (String) tokenInfo.value));
+            tokens.add(new Token(tokenInfo.type, (String) tokenInfo.value, 1, i++));
         }
 
-        tokens.add(new Token(EOF, ""));
+        tokens.add(new Token(EOF, "", 1, i));
         return tokens;
     }
 

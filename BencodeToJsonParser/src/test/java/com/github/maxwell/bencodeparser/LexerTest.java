@@ -87,6 +87,13 @@ public class LexerTest {
         assertNull(scan("d 1:a i1a2e e"));
     }
 
+
+    @Test
+    public void negativeNumber() throws IOException {
+        assertTypes(scan("d 1:a i-1e e"), TokenType.START_DICT, TokenType.STR, TokenType.NUM, TokenType.END_ELEMENT, TokenType.EOF);
+        assertNull(scan("d 1:a i-1fsdfsdjfjsdklfjdskjfklsdjfklsdjfklsf3123e e"));
+    }
+
     @Test
     public void strangeDigits() throws IOException {
         // some strange digits from Character.isDigit() javadoc

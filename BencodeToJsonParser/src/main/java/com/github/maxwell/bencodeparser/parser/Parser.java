@@ -4,7 +4,6 @@ import com.github.maxwell.bencodeparser.lexer.Token;
 import com.github.maxwell.bencodeparser.reporter.ErrorReporter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.github.maxwell.bencodeparser.lexer.TokenType.*;
@@ -12,12 +11,15 @@ import static com.github.maxwell.bencodeparser.lexer.TokenType.*;
 public class Parser {
     private final List<Token> tokens;
     private int curPos = 0;
+    private final ErrorReporter errorReporter = new ErrorReporter();
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
 
     public static Expr parse(List<Token> tokens) {
+        if(tokens == null) return null;
+
         Parser parser = new Parser(tokens);
         return parser.parse();
     }
@@ -26,24 +28,23 @@ public class Parser {
         try {
             Expr expr = parseBDict();
             if(hasExtraTokens()) {
-                ErrorReporter.report("Unexpected tokens at the end: " + extraTokens());
+                errorReporter.report("Unexpected tokens at the end: " + extraTokens() + "\n");
                 return null;
             }
-            return curPos == tokens.size() - 1 ? expr : null;
+            return errorReporter.hasErrors() ? null : expr;
         }
         catch (UnexpectedTokenException e) {
-            ErrorReporter.report("Unexpected token: " + unexpectedToken(e));
+            errorReporter.report(unexpectedToken(e));
             return null;
         }
     }
 
     private String extraTokens() {
-        // CR: use Stream instead
-        StringBuilder extraTokens = new StringBuilder();
-        for(int i = curPos; i < tokens.size(); i++) {
-            extraTokens.append(tokens.get(i).type().toString()).append(i == tokens.size() - 1 ? "" : ", ");
-        }
-        return extraTokens.toString();
+        return tokens.stream()
+                .skip(curPos)
+                .map(Token::type)
+                .toList()
+                .toString();
     }
 
     private boolean hasExtraTokens() {
@@ -51,11 +52,8 @@ public class Parser {
     }
 
     String unexpectedToken(UnexpectedTokenException e) {
-        // CR: it's better to pass token position in token and make reports like
-        // CR: 'line 1, position 3: expected EOF, got STR'
-        return tokens.toString() + e.getToken().toString() + "\n" + " ".repeat(tokens.toString().length() +
-               "Unexpected token: ".length()) + "^" + "_".repeat(e.toString().length() - 2) + "^" + " here\n"
-                + "Expected: " + e.getExpectation() + ", got: " + e.getToken().type().toString() + "\n";
+        return "line " + e.getToken().line() + ", " + "position " + e.getToken().pos() + " unexpected token:\n"
+                + "expected " + e.getExpectation() + ", got " + e.getToken().type().toString() + "\n";
     }
 
     private Expr parseExpr() throws UnexpectedTokenException {
@@ -83,17 +81,27 @@ public class Parser {
         Token token = consume();
         if(token.type() != START_DICT) throw new UnexpectedTokenException(token, "START_DICT");
         List<Expr.BEntry> entries = new ArrayList<>();
+        int start = curPos;
 
         while(!isEndToken()) {
             entries.add(parseBEntry());
         }
 
-        // CR: you should not sort entries by yourself, you should check if they are in lexicographical order
-        // CR: if not - report error
-        entries.sort(Comparator.comparing(o -> o.left().value()));
+        checkEntriesOrder(entries, start);
 
         consume();
         return new Expr.BDict(entries);
+    }
+
+    private void checkEntriesOrder(List<Expr.BEntry> entries, int start) {
+        for(int i = 1; i < entries.size(); i++) {
+            if((entries.get(i - 1).left().value()).compareTo(entries.get(i).left().value()) > 0) {
+                errorReporter.report("line: " + tokens.get(start + 2 * i).line() + ", position: " + tokens.get(start + 2 * i).pos()
+                        + ", unexpected token: " + tokens.get(start + 2 * i).toString() + "\n"
+                        + "Because previous key: " + tokens.get(start + 2 * (i - 1)) + " is bigger than current\n"
+                );
+            }
+        }
     }
 
     private Expr parseBList() {
@@ -126,17 +134,8 @@ public class Parser {
         return peek().type() == END_ELEMENT;
     }
 
-    // CR: probably can inline when 'if' will be removed
     private Expr.BEntry parseBEntry() {
-        Expr.BString left = parseString();
-        Expr right = parseExpr();
-
-        // CR: seems that we never enter then branch
-        if(right == null) {
-            throw new BEntryNotFoundException();
-        }
-
-        return new Expr.BEntry(left, right);
+        return new Expr.BEntry(parseString(), parseExpr());
     }
 
     private Expr.BString parseString() {

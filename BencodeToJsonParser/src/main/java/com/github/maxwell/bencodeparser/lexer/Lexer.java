@@ -14,7 +14,9 @@ public class Lexer {
     private final List<Token> tokens = new ArrayList<>();
     private int curPos;
     private int numberOfLine;
-    private boolean hasErrors = false;
+    private int numberOfToken = 1;
+
+    private final ErrorReporter errorReporter = new ErrorReporter();
 
     private final BufferedReader br;
 
@@ -28,9 +30,10 @@ public class Lexer {
         while ((line = getLine()) != null) {
             numberOfLine++;
             if(scan(line) == null) return null;
+            if(errorReporter.tooManyErrors()) return null;
         }
 
-        tokens.add(new Token(TokenType.EOF, ""));
+        tokens.add(new Token(TokenType.EOF, "", numberOfLine, numberOfToken++));
         return tokens;
     }
 
@@ -48,61 +51,49 @@ public class Lexer {
     }
 
     private List<Token> scan(String line) {
-        try {
-            while (curPos < line.length()) {
-                char c = line.charAt(curPos);
+        while (curPos < line.length()) {
+            char c = line.charAt(curPos);
 
-                if(isWhitespace(c)) {
-                    curPos++;
-                    continue;
+            if(isWhitespace(c)) {
+                curPos++;
+                continue;
+            }
+
+            if (isDigit(c)) {
+                Token string = getString(line);
+                if(string != null)  {
+                    tokens.add(string);
                 }
+                continue;
+            }
 
-                if (isDigit(c)) {
-                    Token string = getString(line);
-                    if(string == null)  {
-                        hasErrors = true;
+            switch (c) {
+
+                case 'd' -> addToken(new Token(TokenType.START_DICT, "", numberOfLine, numberOfToken++));
+
+                case 'l' -> addToken(new Token(TokenType.START_LIST, "", numberOfLine, numberOfToken++));
+
+                case 'i' -> {
+                    curPos++; // skip 'i'
+                    Integer number = getNumber(line, 'e');
+                    if(number == null) {
+                        curPos++;
                         continue;
                     }
-                    tokens.add(string);
-                    continue;
+                    addToken(new Token(TokenType.NUM, String.valueOf(number), numberOfLine, numberOfToken++));
                 }
 
-                switch (c) {
+                case 'e' -> addToken(new Token(TokenType.END_ELEMENT, "", numberOfLine, numberOfToken++));
 
-                    case 'd' -> addToken(new Token(TokenType.START_DICT, ""));
-
-                    case 'l' -> addToken(new Token(TokenType.START_LIST, ""));
-
-                    case 'i' -> {
-                        curPos++; // skip 'i'
-                        // CR: what about negative numbers? https://en.wikipedia.org/wiki/Bencode#Encoding_algorithm
-                        int number = getNumber(line, 'e');
-                        if(number == -1) {
-                            hasErrors = true;
-                            curPos++;
-                            continue;
-                        }
-                        addToken(new Token(TokenType.NUM, String.valueOf(number)));
-                    }
-
-                    case 'e' -> addToken(new Token(TokenType.END_ELEMENT, ""));
-
-                    default -> {
-                        ErrorReporter.report(invalidFormat(line, curPos, c));
-                        hasErrors = true;
-                        curPos++;
-                    }
+                default -> {
+                    errorReporter.report(invalidFormat(line, curPos, c));
+                    curPos++;
                 }
             }
         }
-        // CR: you won't need parser exception anymore after the fixes
-        catch (ParseBencodeException e) {
-            ErrorReporter.report(invalidFormat(e.getMsg(), e.getPos(), e.getC()));
-            return null;
-        }
-
+        numberOfToken = 1;
         curPos = 0;
-        return hasErrors ? null : tokens;
+        return errorReporter.hasErrors() ? null : tokens;
     }
 
     private void addToken(Token token) {
@@ -111,46 +102,64 @@ public class Lexer {
     }
 
     private Token getString(String line) {
-        int len = getNumber(line, ':');
+        Integer len = getNumber(line, ':');
         curPos++; // skip ':'
 
-        if(len == -1) return null;
+        if(len == null) return null;
 
-        // CR: i think we should report problem and move to the end of line
-        if(curPos + len > line.length()) throw new ParseBencodeException(line, line.charAt(curPos - 1), curPos - 1);
+        if(curPos + len > line.length()) {
+            errorReporter.report(invalidFormat(line, curPos - 1, line.charAt(curPos - 1)));
+            curPos = line.length() - 1;
+            return null;
+        }
 
         int start = curPos;
         StringBuilder result = new StringBuilder();
         for (int i = start; i < start + len; i++) {
             char c = line.charAt(i);
             if (!isASCII(c)) {
-                ErrorReporter.report(invalidFormat(line, curPos, c));
-                // CR: you can just add method hasErrors() into ErrorReporter and call it when needed
-                hasErrors = true;
+                errorReporter.report(invalidFormat(line, curPos, c));
             }
             result.append(c);
         }
         curPos = start + len;
-        return new Token(TokenType.STR, result.toString());
+        return new Token(TokenType.STR, result.toString(), numberOfLine, numberOfToken++);
     }
 
-    private int getNumber(String line, char stopChar) {
+    private Integer getNumber(String line, char stopChar) {
         char c;
         int start = curPos;
+        boolean hasNumberError = false;
 
-        // CR: i think if we see unexpected symbol we should report problem and continue scanning starting from this symbol
         while ((c = line.charAt(curPos)) != stopChar) {
-            if (!isDigit(c)) throw new ParseBencodeException(line, c, curPos);
+            if(isDigit(c)) {
+                curPos++;
+                continue;
+            }
+            else if(isNegative(c, curPos, start)) {
+                curPos++;
+                continue;
+            }
+
+            errorReporter.report(invalidFormat(line, curPos, c));
+
+            hasNumberError = true;
             curPos++;
         }
+
+        if(hasNumberError) return null;
 
         try {
             return Integer.parseInt(line.substring(start, curPos));
         }
         catch (NumberFormatException e) {
-            ErrorReporter.report(line + "\n" + " ".repeat(start) + "^--- Too large number here");
+            errorReporter.report("line: " + numberOfLine + ", position: " + curPos + "\n" + line + "\n" + " ".repeat(start) + "^--- Too large number here\n");
         }
-        return -1;
+        return null;
+    }
+
+    private boolean isNegative(char c, int curPos, int start) {
+        return c == '-' && curPos == start;
     }
 
     private static boolean isDigit(char c) {

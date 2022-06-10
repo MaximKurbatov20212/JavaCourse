@@ -116,11 +116,6 @@ public class IntegrationTest {
     @Test
     public void changeCollocation() {
         String str = "d 1:b i1e 1:a i2e e"; // ok
-        String rightAnswer = """
-        {
-            "a" : 2,
-            "b" : 1
-        }""";
-        assertEquals(rightAnswer, parse((scan(str))));
+        assertNull(parse((scan(str))));
     }
 }

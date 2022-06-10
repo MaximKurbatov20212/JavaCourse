@@ -8,10 +8,17 @@ import java.io.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        // CR: please fix program input / output according to task: https://docs.google.com/document/d/1cCvY-qxurNCsEtj-expMcRlBJkq1FuLW4vDDOn426_c
-        FileReader fileReader = new FileReader("src/main/resources/in.txt");
+        FileWriter fileWriter = new FileWriter("src/main/resources/" + args[1]);
+        FileReader fileReader = new FileReader("src/main/resources/" + args[0]);
+
         BufferedReader br = new BufferedReader(fileReader);
-        // CR: npe if Lexer returned null
-        System.out.println(JsonPrinter.print(Parser.parse(Lexer.scan(br))));
+        String result = JsonPrinter.print(Parser.parse(Lexer.scan(br)));
+
+        if(result != null) {
+            fileWriter.write(result);
+        }
+
+        fileWriter.close();
+        fileReader.close();
     }
 }
