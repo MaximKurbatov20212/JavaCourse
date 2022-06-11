@@ -7,7 +7,7 @@ sealed public interface Expr {
 
     record BNumber(int value) implements Expr {}
 
-    record BEntry(BString left, Expr right) implements Expr {}
+    record BEntry(BString key, Expr value) implements Expr {}
 
     record BList(List<Expr> list) implements Expr {}
 

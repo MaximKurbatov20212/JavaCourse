@@ -13,7 +13,7 @@ public class Parser {
     private int curPos = 0;
     private final ErrorReporter errorReporter = new ErrorReporter();
 
-    public Parser(List<Token> tokens) {
+    private Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
 
@@ -40,15 +40,14 @@ public class Parser {
     }
 
     private String extraTokens() {
-        return tokens.stream()
-                .skip(curPos)
+        return tokens.subList(curPos, tokens.size()).stream()
                 .map(Token::type)
                 .toList()
                 .toString();
     }
 
     private boolean hasExtraTokens() {
-        return curPos !=  tokens.size() - 1;
+        return curPos != tokens.size() - 1;
     }
 
     String unexpectedToken(UnexpectedTokenException e) {
@@ -58,23 +57,12 @@ public class Parser {
 
     private Expr parseExpr() throws UnexpectedTokenException {
         Token token = peek();
-        switch (token.type()) {
-            case STR, NUM -> {
-                return parsePrimary();
-            }
-            case START_LIST -> {
-                return parseBList();
-            }
-            case START_DICT -> {
-                try {
-                    return parseBDict();
-                }
-                catch (BEntryNotFoundException e) {
-                    return null;
-                }
-            }
+        return switch (token.type()) {
+            case STR, NUM -> parsePrimary();
+            case START_LIST -> parseBList();
+            case START_DICT -> parseBDict();
             default -> throw new UnexpectedTokenException(token, "STR, NUM, START_DICT or START_LIST");
-        }
+        };
     }
 
     private Expr parseBDict() {
@@ -84,7 +72,11 @@ public class Parser {
         int start = curPos;
 
         while(!isEndToken()) {
-            entries.add(parseBEntry());
+            // CR: just compare with prev key while you're in a loop
+            // CR: also you can store prevBEntryPos right here (using curPos)
+            Expr.BString key = parseString();
+            Expr value = parseExpr();
+            entries.add(new Expr.BEntry(key, value));
         }
 
         checkEntriesOrder(entries, start);
@@ -95,7 +87,9 @@ public class Parser {
 
     private void checkEntriesOrder(List<Expr.BEntry> entries, int start) {
         for(int i = 1; i < entries.size(); i++) {
-            if((entries.get(i - 1).left().value()).compareTo(entries.get(i).left().value()) > 0) {
+            String prevKey = entries.get(i - 1).key().value();
+            String curKey = entries.get(i).key().value();
+            if(prevKey.compareTo(curKey) > 0) {
                 errorReporter.report("line: " + tokens.get(start + 2 * i).line() + ", position: " + tokens.get(start + 2 * i).pos()
                         + ", unexpected token: " + tokens.get(start + 2 * i).toString() + "\n"
                         + "Because previous key: " + tokens.get(start + 2 * (i - 1)) + " is bigger than current\n"
@@ -132,10 +126,6 @@ public class Parser {
 
     private boolean isEndToken() {
         return peek().type() == END_ELEMENT;
-    }
-
-    private Expr.BEntry parseBEntry() {
-        return new Expr.BEntry(parseString(), parseExpr());
     }
 
     private Expr.BString parseString() {

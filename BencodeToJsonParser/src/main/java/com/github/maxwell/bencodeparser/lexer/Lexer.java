@@ -14,6 +14,7 @@ public class Lexer {
     private final List<Token> tokens = new ArrayList<>();
     private int curPos;
     private int numberOfLine;
+    // CR: user does not care about number of token, he cares about position in line
     private int numberOfToken = 1;
 
     private final ErrorReporter errorReporter = new ErrorReporter();
@@ -30,8 +31,8 @@ public class Lexer {
         while ((line = getLine()) != null) {
             numberOfLine++;
             if(scan(line) == null) return null;
-            if(errorReporter.tooManyErrors()) return null;
         }
+        if (errorReporter.hasErrors()) return null;
 
         tokens.add(new Token(TokenType.EOF, "", numberOfLine, numberOfToken++));
         return tokens;
@@ -93,7 +94,7 @@ public class Lexer {
         }
         numberOfToken = 1;
         curPos = 0;
-        return errorReporter.hasErrors() ? null : tokens;
+        return errorReporter.tooManyErrors() ? null : tokens;
     }
 
     private void addToken(Token token) {
@@ -132,18 +133,10 @@ public class Lexer {
         boolean hasNumberError = false;
 
         while ((c = line.charAt(curPos)) != stopChar) {
-            if(isDigit(c)) {
-                curPos++;
-                continue;
+            if (!isDigit(c) && !isNumberNegation(c, curPos, start)) {
+                errorReporter.report(invalidFormat(line, curPos, c));
+                hasNumberError = true;
             }
-            else if(isNegative(c, curPos, start)) {
-                curPos++;
-                continue;
-            }
-
-            errorReporter.report(invalidFormat(line, curPos, c));
-
-            hasNumberError = true;
             curPos++;
         }
 
@@ -153,12 +146,17 @@ public class Lexer {
             return Integer.parseInt(line.substring(start, curPos));
         }
         catch (NumberFormatException e) {
-            errorReporter.report("line: " + numberOfLine + ", position: " + curPos + "\n" + line + "\n" + " ".repeat(start) + "^--- Too large number here\n");
+            errorReporter.report(("""
+                    line: %d, position: %d
+                    %s
+                    %s^--- Too large number here
+                    """
+            ).formatted(numberOfLine, curPos, line, " ".repeat(start)));
         }
         return null;
     }
 
-    private boolean isNegative(char c, int curPos, int start) {
+    private boolean isNumberNegation(char c, int curPos, int start) {
         return c == '-' && curPos == start;
     }
 

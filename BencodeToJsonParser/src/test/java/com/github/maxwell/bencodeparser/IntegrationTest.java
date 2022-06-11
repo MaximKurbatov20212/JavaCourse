@@ -3,12 +3,11 @@ package com.github.maxwell.bencodeparser;
 import com.github.maxwell.bencodeparser.lexer.Lexer;
 import com.github.maxwell.bencodeparser.lexer.Token;
 import com.github.maxwell.bencodeparser.parser.Expr;
-import com.github.maxwell.bencodeparser.parser.JsonPrinter;
+import com.github.maxwell.bencodeparser.printer.JsonPrinter;
 import com.github.maxwell.bencodeparser.parser.Parser;
 import org.junit.Test;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
