@@ -60,8 +60,6 @@ public class Lexer {
             }
             tokenPosition = curPos;
 
-            int tokenPosition = curPos;
-
             if (isDigit(c)) {
                 Token string = getString(line);
                 if(string != null)  {
