@@ -113,7 +113,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void changeCollocation() {
+    public void invalidOrder() {
         String str = "d 1:b i1e 1:a i2e e"; // ok
         assertNull(parse((scan(str))));
     }

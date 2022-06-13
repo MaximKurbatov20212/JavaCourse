@@ -8,10 +8,17 @@ import java.io.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        // CR: user can give you any path, not just to sources
-        FileWriter fileWriter = new FileWriter("src/main/resources/" + args[1]);
-        // CR: second argument is optional
-        FileReader fileReader = new FileReader("src/main/resources/" + args[0]);
+        if(hasErrors(args)){
+            System.err.println("Expected format: Main.java <filename> [output-file]\n" +
+                    "- filename - torrent file in bencode format.\n" +
+                    "- output-file - output file in json format (optional argument). Default - \"out.json\".");
+            return;
+        }
+
+        FileReader fileReader = new FileReader(args[0]);
+
+        String outputFile = (args.length == 1) ? "out.json" : args[1];
+        FileWriter fileWriter = new FileWriter(outputFile);
 
         BufferedReader br = new BufferedReader(fileReader);
         String result = JsonPrinter.print(Parser.parse(Lexer.scan(br)));
@@ -22,5 +29,17 @@ public class Main {
 
         fileWriter.close();
         fileReader.close();
+    }
+
+    private static boolean hasErrors(String[] args) {
+        if(args.length == 0) {
+            System.err.println("Invalid input format: too few arguments.");
+            return true;
+        }
+        if (args.length > 2) {
+            System.err.println("Invalid input format: too many arguments.");
+            return true;
+        }
+        return false;
     }
 }

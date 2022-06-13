@@ -54,23 +54,13 @@ public class JsonPrinter {
     }
 
     private String printBExpr(Expr expr, int shifts) {
-        // CR: use enhanced switch expression
-        if(expr instanceof Expr.BString) {
-            return printBString((Expr.BString) expr);
-        }
-        else if(expr instanceof Expr.BNumber) {
-            return printBNumber((Expr.BNumber) expr);
-        }
-        else if(expr instanceof Expr.BList) {
-            return printBList((Expr.BList) expr, shifts);
-        }
-        else if(expr instanceof  Expr.BDict) {
-            return printBDict((Expr.BDict) expr, shifts);
-        }
-        else if(expr instanceof  Expr.BEntry) {
-            return printBEntry((Expr.BEntry) expr, shifts);
-        }
-        throw new RuntimeException("Invalid type. Type is not a successor of Expr");
+        return switch (expr) {
+            case Expr.BString bString -> printBString(bString);
+            case Expr.BNumber bNumber -> printBNumber(bNumber);
+            case Expr.BEntry bEntry -> printBEntry(bEntry, shifts);
+            case Expr.BDict bDict -> printBDict(bDict, shifts);
+            case Expr.BList bList -> printBList(bList, shifts);
+        };
     }
 
     private static String printShifts(int shifts) {

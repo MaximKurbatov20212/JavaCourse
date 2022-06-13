@@ -14,8 +14,7 @@ public class Lexer {
     private final List<Token> tokens = new ArrayList<>();
     private int curPos;
     private int numberOfLine;
-    // CR: user does not care about number of token, he cares about position in line
-    private int numberOfToken = 1;
+    private int tokenPosition; // just position of the first char in token
 
     private final ErrorReporter errorReporter = new ErrorReporter();
 
@@ -34,7 +33,7 @@ public class Lexer {
         }
         if (errorReporter.hasErrors()) return null;
 
-        tokens.add(new Token(TokenType.EOF, "", numberOfLine, numberOfToken++));
+        tokens.add(new Token(TokenType.EOF, "", numberOfLine, tokenPosition));
         return tokens;
     }
 
@@ -59,6 +58,9 @@ public class Lexer {
                 curPos++;
                 continue;
             }
+            tokenPosition = curPos;
+
+            int tokenPosition = curPos;
 
             if (isDigit(c)) {
                 Token string = getString(line);
@@ -70,9 +72,9 @@ public class Lexer {
 
             switch (c) {
 
-                case 'd' -> addToken(new Token(TokenType.START_DICT, "", numberOfLine, numberOfToken++));
+                case 'd' -> addToken(new Token(TokenType.START_DICT, "", numberOfLine, tokenPosition));
 
-                case 'l' -> addToken(new Token(TokenType.START_LIST, "", numberOfLine, numberOfToken++));
+                case 'l' -> addToken(new Token(TokenType.START_LIST, "", numberOfLine, tokenPosition));
 
                 case 'i' -> {
                     curPos++; // skip 'i'
@@ -81,10 +83,10 @@ public class Lexer {
                         curPos++;
                         continue;
                     }
-                    addToken(new Token(TokenType.NUM, String.valueOf(number), numberOfLine, numberOfToken++));
+                    addToken(new Token(TokenType.NUM, String.valueOf(number), numberOfLine, tokenPosition));
                 }
 
-                case 'e' -> addToken(new Token(TokenType.END_ELEMENT, "", numberOfLine, numberOfToken++));
+                case 'e' -> addToken(new Token(TokenType.END_ELEMENT, "", numberOfLine, tokenPosition));
 
                 default -> {
                     errorReporter.report(invalidFormat(line, curPos, c));
@@ -92,7 +94,6 @@ public class Lexer {
                 }
             }
         }
-        numberOfToken = 1;
         curPos = 0;
         return errorReporter.tooManyErrors() ? null : tokens;
     }
@@ -124,7 +125,7 @@ public class Lexer {
             result.append(c);
         }
         curPos = start + len;
-        return new Token(TokenType.STR, result.toString(), numberOfLine, numberOfToken++);
+        return new Token(TokenType.STR, result.toString(), numberOfLine, tokenPosition);
     }
 
     private Integer getNumber(String line, char stopChar) {

@@ -69,32 +69,30 @@ public class Parser {
         Token token = consume();
         if(token.type() != START_DICT) throw new UnexpectedTokenException(token, "START_DICT");
         List<Expr.BEntry> entries = new ArrayList<>();
-        int start = curPos;
+
+        String prevKey = null;
 
         while(!isEndToken()) {
-            // CR: just compare with prev key while you're in a loop
-            // CR: also you can store prevBEntryPos right here (using curPos)
+            String curKey = tokens.get(curPos).value();
+            checkOrder(curKey, prevKey);
+
             Expr.BString key = parseString();
             Expr value = parseExpr();
             entries.add(new Expr.BEntry(key, value));
-        }
 
-        checkEntriesOrder(entries, start);
+            prevKey = curKey;
+        }
 
         consume();
         return new Expr.BDict(entries);
     }
 
-    private void checkEntriesOrder(List<Expr.BEntry> entries, int start) {
-        for(int i = 1; i < entries.size(); i++) {
-            String prevKey = entries.get(i - 1).key().value();
-            String curKey = entries.get(i).key().value();
-            if(prevKey.compareTo(curKey) > 0) {
-                errorReporter.report("line: " + tokens.get(start + 2 * i).line() + ", position: " + tokens.get(start + 2 * i).pos()
-                        + ", unexpected token: " + tokens.get(start + 2 * i).toString() + "\n"
-                        + "Because previous key: " + tokens.get(start + 2 * (i - 1)) + " is bigger than current\n"
-                );
-            }
+    private void checkOrder(String curKey, String prevKey) {
+        if(prevKey != null && prevKey.compareTo(curKey) > 0) {
+            errorReporter.report("line: " + tokens.get(curPos).line() + ", position: " + tokens.get(curPos).pos()
+                    + ", unexpected token: " + curKey + "\n"
+                    + "Because previous key: " + prevKey + " is bigger than current\n"
+            );
         }
     }
 
