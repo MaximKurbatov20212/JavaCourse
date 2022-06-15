@@ -20,7 +20,7 @@ public class Lexer {
 
     private final BufferedReader br;
 
-    public Lexer(BufferedReader br) {
+    private Lexer(BufferedReader br) {
         this.br = br;
     }
 
@@ -62,7 +62,7 @@ public class Lexer {
 
             if (isDigit(c)) {
                 Token string = getString(line);
-                if(string != null)  {
+                if(string != null) {
                     tokens.add(string);
                 }
                 continue;
@@ -131,12 +131,22 @@ public class Lexer {
         int start = curPos;
         boolean hasNumberError = false;
 
-        while ((c = line.charAt(curPos)) != stopChar) {
+        while (curPos < line.length() && (c = line.charAt(curPos)) != stopChar) {
             if (!isDigit(c) && !isNumberNegation(c, curPos, start)) {
                 errorReporter.report(invalidFormat(line, curPos, c));
                 hasNumberError = true;
             }
             curPos++;
+        }
+
+        if (curPos == line.length()) {
+            errorReporter.report(("""
+                    line: %d, position: %d
+                    %s
+                    %s^--- No closing '%c' for number
+                    """
+            ).formatted(numberOfLine, curPos, line, " ".repeat(start), stopChar));
+            hasNumberError = true;
         }
 
         if(hasNumberError) return null;

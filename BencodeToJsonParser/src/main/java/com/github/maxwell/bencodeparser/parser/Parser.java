@@ -89,9 +89,10 @@ public class Parser {
 
     private void checkOrder(String curKey, String prevKey) {
         if(prevKey != null && prevKey.compareTo(curKey) > 0) {
-            errorReporter.report("line: " + tokens.get(curPos).line() + ", position: " + tokens.get(curPos).pos()
-                    + ", unexpected token: " + curKey + "\n"
-                    + "Because previous key: " + prevKey + " is bigger than current\n"
+            errorReporter.report(("""
+                    line: %d, position: %d, unexpected token: %s
+                    Because previous key: %s is bigger than current
+                    """).formatted(tokens.get(curPos).line(), tokens.get(curPos).pos(), curKey, prevKey)
             );
         }
     }

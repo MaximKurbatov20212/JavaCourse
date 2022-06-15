@@ -17,7 +17,7 @@ import java.util.List;
 
 public class LexerTest {
 
-    private static List<TokenType> scan(String expressions) throws IOException {
+    private static List<TokenType> scan(String expressions) {
         BufferedReader br = new BufferedReader(new StringReader(expressions));
         List<Token> tokens = Lexer.scan(br);
         return tokens == null ? null : tokens.stream().map(Token::type).toList();
@@ -28,36 +28,36 @@ public class LexerTest {
     }
 
     @Test
-    public void empty() throws IOException {
+    public void empty() {
         assertTypes(scan(""), TokenType.EOF);
     }
 
     @Test
-    public void tooLargeNumber() throws IOException {
+    public void tooLargeNumber() {
         assertNull(scan("i1000000000000000000000000e"));
     }
 
     @Test
-    public void unknownChar() throws IOException {
+    public void unknownChar() {
         Assert.assertNull(scan("$"));
         Assert.assertNull(scan("&"));
         Assert.assertNull(scan("-"));
     }
 
     @Test
-    public void emptyDict() throws IOException {
+    public void emptyDict() {
         assertTypes(scan("d e"), TokenType.START_DICT, TokenType.END_ELEMENT, TokenType.EOF);
         assertTypes(scan("de"), TokenType.START_DICT, TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test
-    public void emptyList() throws IOException {
+    public void emptyList() {
         assertTypes(scan("l e"), TokenType.START_LIST, TokenType.END_ELEMENT, TokenType.EOF);
         assertTypes(scan("le"), TokenType.START_LIST, TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test
-    public void lonelyToken() throws IOException {
+    public void lonelyToken() {
         assertTypes(scan("d"), TokenType.START_DICT, TokenType.EOF);
         assertTypes(scan("l"), TokenType.START_LIST, TokenType.EOF);
         assertTypes(scan("i1e"), TokenType.NUM, TokenType.EOF);
@@ -66,36 +66,36 @@ public class LexerTest {
     }
 
     @Test
-    public void dict() throws IOException {
+    public void dict() {
         assertTypes(scan("d 1:a i1e e"), TokenType.START_DICT, TokenType.STR, TokenType.NUM, TokenType.END_ELEMENT, TokenType.EOF);
         assertTypes(scan("d1:ai1ee"), TokenType.START_DICT, TokenType.STR, TokenType.NUM, TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test
-    public void correctDict() throws IOException {
+    public void correctDict() {
         assertTypes(scan("d 1:a l i1e e e"), TokenType.START_DICT, TokenType.STR, TokenType.START_LIST, TokenType.NUM, TokenType.END_ELEMENT, TokenType.END_ELEMENT, TokenType.EOF);
         assertTypes(scan("d1:ali1eee"), TokenType.START_DICT, TokenType.STR, TokenType.START_LIST, TokenType.NUM, TokenType.END_ELEMENT, TokenType.END_ELEMENT, TokenType.EOF);
     }
 
     @Test
-    public void incorrectString() throws IOException {
+    public void incorrectString() {
         assertNull(scan("100:a"));
     }
 
     @Test
-    public void incorrectNumber() throws IOException {
+    public void incorrectNumber() {
         assertNull(scan("d 1:a i1a2e e"));
     }
 
 
     @Test
-    public void negativeNumber() throws IOException {
+    public void negativeNumber() {
         assertTypes(scan("d 1:a i-1e e"), TokenType.START_DICT, TokenType.STR, TokenType.NUM, TokenType.END_ELEMENT, TokenType.EOF);
         assertNull(scan("d 1:a i-1fsdfsdjfjsdklfjdskjfklsdjfklsdjfklsf3123e e"));
     }
 
     @Test
-    public void strangeDigits() throws IOException {
+    public void strangeDigits() {
         // some strange digits from Character.isDigit() javadoc
         String digits = "\u0660\u06F0\u0966\uFF10";
         for (int i = 0; i < digits.length(); i++) {
